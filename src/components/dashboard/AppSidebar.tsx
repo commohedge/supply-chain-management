@@ -5,7 +5,7 @@ import {
   TrendingUp,
   Clock,
   Ship,
-  Settings,
+  Database,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -87,8 +87,8 @@ export function AppSidebar() {
                 className="hover:bg-sidebar-accent/50 transition-colors"
                 activeClassName="bg-sidebar-accent text-primary font-medium"
               >
-                <Settings className="mr-2 h-4 w-4" />
-                {!collapsed && <span className="text-sm">Configuration</span>}
+                <Database className="mr-2 h-4 w-4" />
+                {!collapsed && <span className="text-sm">Référentiel</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
