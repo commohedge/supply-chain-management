@@ -1,38 +1,15 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
-
-const forwardCurve = [
-  { period: "Q2 26", current: 590, m1: 460, m3: 450 },
-  { period: "Q3 26", current: 615, m1: 480, m3: 460 },
-  { period: "Q4 26", current: 630, m1: 500, m3: 480 },
-  { period: "Q1 27", current: 645, m1: 520, m3: 500 },
-  { period: "Q2 27", current: 660, m1: 540, m3: 520 },
-  { period: "Q3 27", current: 675, m1: 560, m3: 540 },
-  { period: "Q4 27", current: 690, m1: 580, m3: 560 },
-];
-
-const optionValue = [
-  { period: "Q2 2026", value: 18 },
-  { period: "Q3 2026", value: 28 },
-  { period: "Q4 2026", value: 32 },
-  { period: "Q1 2027", value: 26 },
-  { period: "Q2 2027", value: 22 },
-  { period: "Q3 2027", value: 16 },
-];
-
-const openDestPie = [
-  { name: "India", value: 0.42 },
-  { name: "Brazil", value: 0.30 },
-  { name: "Other Asia", value: 0.24 },
-  { name: "Africa", value: 0.14 },
-  { name: "Others", value: 0.10 },
-];
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function OptionalityPage() {
+  const { config } = useDashboardData();
+  const { kpis, forwardCurve, optionValue, openDest, floatingStock, scenarios } = config.optionality;
+
   return (
     <DashboardLayout>
       <div className="page-header">
@@ -43,9 +20,9 @@ export default function OptionalityPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <KpiCard label="Forward Curve (Mid)" value="$615/t" subtitle="Q3 2026" change="+3.2% vs 30d" changeDirection="up" />
-        <KpiCard label="Option Value*" value="$28/t" subtitle="Average" change="+4.1%" changeDirection="up" />
-        <KpiCard label="Open Destination Vol." value="1.2 Mt" subtitle="15% of total pipeline" change="+7%" changeDirection="up" />
+        {kpis.map((k, i) => (
+          <KpiCard key={i} label={k.label} value={k.value} subtitle={k.subtitle} change={k.change} changeDirection={k.changeDirection} />
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -81,20 +58,20 @@ export default function OptionalityPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Open Destination Volume by Region" subtitle="Total: 1.2 Mt" />
+          <SectionHeader title="Open Destination Volume by Region" subtitle={`Total: ${openDest.reduce((s, d) => s + d.value, 0).toFixed(1)} Mt`} />
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
-                <Pie data={openDestPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85} innerRadius={50} strokeWidth={2} stroke="hsl(0,0%,4%)">
-                  {openDestPie.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
+                <Pie data={openDest} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85} innerRadius={50} strokeWidth={2} stroke="hsl(0,0%,4%)">
+                  {openDest.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip {...ttStyle} />
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-2 text-sm">
-              {openDestPie.map((d, i) => (
+              {openDest.map((d, i) => (
                 <div key={d.name} className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-sm" style={{ background: COLORS[i] }} />
+                  <div className="w-3 h-3 rounded-sm" style={{ background: COLORS[i % COLORS.length] }} />
                   <span className="text-muted-foreground w-20">{d.name}</span>
                   <span className="font-mono">{d.value} Mt</span>
                 </div>
@@ -108,9 +85,11 @@ export default function OptionalityPage() {
           <DataTable
             headers={["Region", "Current", "vs Last 30 Days", "vs Last Year"]}
             rows={[
-              ["India", "58", <span className="kpi-change-up">▲ +4</span>, <span className="kpi-change-down">▼ -6</span>],
-              ["Brazil", "72", <span className="kpi-change-up">▲ +6</span>, <span className="kpi-change-down">▼ -4</span>],
-              ["Other Asia", "45", <span className="kpi-change-up">▲ +3</span>, <span className="kpi-change-down">▼ -8</span>],
+              ...floatingStock.map(f => [
+                f.region, f.current,
+                <span className={f.vs30d.includes("▲") ? "kpi-change-up" : "kpi-change-down"}>{f.vs30d}</span>,
+                <span className={f.vsLastYear.includes("▲") ? "kpi-change-up" : "kpi-change-down"}>{f.vsLastYear}</span>,
+              ]),
               [<span className="font-bold">Global</span>, <span className="font-bold">61</span>, <span className="font-bold kpi-change-up">▲ +4</span>, <span className="font-bold kpi-change-down">▼ -7</span>],
             ]}
           />
@@ -121,11 +100,12 @@ export default function OptionalityPage() {
         <SectionHeader title="Optionality Scenarios — Netback Impact" subtitle="$/t" />
         <DataTable
           headers={["Scenario", "Assumption", "Netback Impact", "vs Base"]}
-          rows={[
-            [<span className="font-semibold">Base Case</span>, "Current forward curve (Q3 2026)", <span className="font-mono">$615</span>, "—"],
-            [<span className="font-semibold text-success">Upside</span>, "Stronger demand (+10% price)", <span className="font-mono text-success">$665</span>, <span className="kpi-change-up">+$50</span>],
-            [<span className="font-semibold text-destructive">Downside</span>, "Softer demand (-10% price)", <span className="font-mono text-destructive">$565</span>, <span className="kpi-change-down">-$50</span>],
-          ]}
+          rows={scenarios.map(s => [
+            <span className={`font-semibold ${s.scenario === "Upside" ? "text-success" : s.scenario === "Downside" ? "text-destructive" : ""}`}>{s.scenario}</span>,
+            s.assumption,
+            <span className={`font-mono ${s.scenario === "Upside" ? "text-success" : s.scenario === "Downside" ? "text-destructive" : ""}`}>{s.netbackImpact}</span>,
+            <span className={s.vsBase.includes("+") ? "kpi-change-up" : s.vsBase.includes("-") ? "kpi-change-down" : ""}>{s.vsBase}</span>,
+          ])}
         />
         <p className="mt-4 text-xs text-muted-foreground italic">*Option value represents the estimated value of keeping destinations open, based on the volatility of the forward curve and historical price movements.</p>
       </div>
