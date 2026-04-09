@@ -374,6 +374,51 @@ const defaultConfig: DashboardConfig = {
       { origin: "Laâyoune", destination: "Paradip (Inde)", product: "Acide Phosphorique", volume: "200 kt/trim", transitDays: "20-25" },
     ],
   },
+  referentiel: {
+    ports: [
+      { name: "Jorf Lasfar", location: "El Jadida, Maroc", capacityMt: 23, currentUtilization: "82%", products: "DAP, MAP, TSP, Acide Phosphorique", status: "Opérationnel" },
+      { name: "Safi", location: "Safi, Maroc", capacityMt: 10, currentUtilization: "71%", products: "NPK, NPS, DAP", status: "Opérationnel" },
+      { name: "Casablanca", location: "Casablanca, Maroc", capacityMt: 5, currentUtilization: "63%", products: "TSP, Roche Phosphatée", status: "Opérationnel" },
+      { name: "Laâyoune", location: "Laâyoune, Maroc", capacityMt: 4, currentUtilization: "45%", products: "Acide Phosphorique, Roche", status: "Opérationnel" },
+      { name: "Bayóvar", location: "Piura, Pérou", capacityMt: 3.9, currentUtilization: "58%", products: "Roche Phosphatée", status: "Opérationnel" },
+    ],
+    exportProducts: [
+      { name: "DAP (Diammonium Phosphate)", category: "Engrais phosphaté", annualCapacity: "~4.2 Mt", currentPrice: "$610/t", mainMarkets: "Inde, Brésil, Afrique", unit: "Mt" },
+      { name: "MAP (Monoammonium Phosphate)", category: "Engrais phosphaté", annualCapacity: "~2.8 Mt", currentPrice: "$575/t", mainMarkets: "Brésil, Argentine", unit: "Mt" },
+      { name: "Acide Phosphorique (H₃PO₄)", category: "Produit intermédiaire", annualCapacity: "~3.1 Mt", currentPrice: "$780/t P₂O₅", mainMarkets: "Inde, Europe", unit: "Mt P₂O₅" },
+      { name: "TSP (Triple Superphosphate)", category: "Engrais phosphaté", annualCapacity: "~1.2 Mt", currentPrice: "$420/t", mainMarkets: "Europe, Afrique", unit: "Mt" },
+      { name: "NPK / NPS", category: "Engrais composé", annualCapacity: "~0.8 Mt", currentPrice: "$490/t", mainMarkets: "Afrique (sols spécifiques)", unit: "Mt" },
+      { name: "Roche Phosphatée", category: "Matière première", annualCapacity: "~3.5 Mt export", currentPrice: "$110/t", mainMarkets: "Divers", unit: "Mt" },
+    ],
+    importMaterials: [
+      { name: "Soufre (Sulfur)", category: "Intrant critique", annualVolume: "~8.3 Mt/an", currentPrice: "$142/t CFR Maroc", mainSuppliers: "QatarEnergy, ADNOC, Aramco, Gazprom", usage: "Acide sulfurique → attaque roche phosphatée" },
+      { name: "Ammoniac (NH₃)", category: "Intrant critique", annualVolume: "~2.5 Mt/an", currentPrice: "$385/t CFR Maroc", mainSuppliers: "Trinité-et-Tobago, CF Industries, EuroChem", usage: "Production DAP/MAP (engrais azotés-phosphorés)" },
+      { name: "Potasse (KCl)", category: "Intrant secondaire", annualVolume: "Variable", currentPrice: "$290/t CFR", mainSuppliers: "Nutrien (Canada), Producteurs européens", usage: "Engrais ternaires (NPK)" },
+      { name: "Fuel / Énergie", category: "Énergie", annualVolume: "Variable", currentPrice: "Variable", mainSuppliers: "ONEE, marché international", usage: "Procédés industriels, transport" },
+    ],
+    suppliers: [
+      { name: "QatarEnergy", country: "Qatar", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
+      { name: "ADNOC", country: "Émirats Arabes Unis", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
+      { name: "Saudi Aramco", country: "Arabie Saoudite", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
+      { name: "Gazprom", country: "Russie", zone: "Europe / CEI", products: "Soufre", contractType: "Spot + Contrat", rating: "B+" },
+      { name: "CF Industries", country: "États-Unis", zone: "Amérique du Nord", products: "Ammoniac", contractType: "Contrat annuel", rating: "A" },
+      { name: "Trinidad Nitrogen", country: "Trinité-et-Tobago", zone: "Amérique du Nord", products: "Ammoniac", contractType: "Long-terme", rating: "A" },
+      { name: "EuroChem", country: "Suisse / Russie", zone: "Europe / CEI", products: "Ammoniac", contractType: "Spot", rating: "B+" },
+      { name: "Nutrien", country: "Canada", zone: "Amérique du Nord", products: "Potasse (KCl)", contractType: "Contrat annuel", rating: "A" },
+      { name: "Fertiberia", country: "Espagne", zone: "Europe", products: "Ammoniac", contractType: "Spot", rating: "B" },
+    ],
+    clients: [
+      { name: "Coromandel International", country: "Inde", zone: "Asie du Sud", products: "DAP, Acide Phosphorique", annualVolume: "~1.2 Mt", contractType: "Long-terme" },
+      { name: "IFFCO", country: "Inde", zone: "Asie du Sud", products: "DAP", annualVolume: "~0.8 Mt", contractType: "Long-terme" },
+      { name: "RCF (Rashtriya Chemicals)", country: "Inde", zone: "Asie du Sud", products: "DAP, Acide Phosphorique", annualVolume: "~0.5 Mt", contractType: "Contrat annuel" },
+      { name: "Yara Brasil", country: "Brésil", zone: "Amérique Latine", products: "MAP, DAP", annualVolume: "~0.9 Mt", contractType: "Contrat annuel" },
+      { name: "Mosaic Fertilizantes", country: "Brésil", zone: "Amérique Latine", products: "MAP", annualVolume: "~0.6 Mt", contractType: "Spot + Contrat" },
+      { name: "Gouvernement Éthiopie", country: "Éthiopie", zone: "Afrique de l'Est", products: "NPK/NPS", annualVolume: "~0.4 Mt", contractType: "Contrat gouvernemental" },
+      { name: "Gouvernement Nigeria", country: "Nigeria", zone: "Afrique de l'Ouest", products: "NPK", annualVolume: "~0.3 Mt", contractType: "Contrat gouvernemental" },
+      { name: "Groupe Roullier", country: "France", zone: "Europe", products: "Acide Phosphorique, TSP", annualVolume: "~0.2 Mt", contractType: "Contrat annuel" },
+      { name: "Koch Fertilizer", country: "États-Unis", zone: "Amérique du Nord", products: "DAP", annualVolume: "~0.15 Mt", contractType: "Spot" },
+    ],
+  },
 };
 
 // ── Context ──────────────────────────────────────────────────
