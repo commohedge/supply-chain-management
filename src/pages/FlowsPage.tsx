@@ -4,7 +4,7 @@ import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 export default function FlowsPage() {
   const { config } = useDashboardData();
-  const { arbitrage, insights, tradeRoutes } = config.flows;
+  const { arbitrage = [], insights = [], tradeRoutes = [] } = config.flows;
 
   return (
     <DashboardLayout>

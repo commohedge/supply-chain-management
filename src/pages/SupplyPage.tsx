@@ -8,7 +8,7 @@ const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px 
 
 export default function SupplyPage() {
   const { config } = useDashboardData();
-  const { kpis, production, volumeByStatus, ports, vessels, constraints, rawMaterials } = config.supply;
+  const { kpis = [], production = [], volumeByStatus = [], ports = [], vessels = { inPort: 0, atSea: 0, charterOptions: 0 }, constraints = [], rawMaterials = [] } = config.supply;
 
   return (
     <DashboardLayout>

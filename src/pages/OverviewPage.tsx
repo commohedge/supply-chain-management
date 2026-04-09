@@ -9,7 +9,7 @@ const ttStyle = {
 
 export default function OverviewPage() {
   const { config } = useDashboardData();
-  const { kpis, storage, demand, forecast, imports, exports } = config.overview;
+  const { kpis = [], storage = [], demand = [], forecast = [], imports = [], exports: exportProducts = [] } = config.overview;
 
   return (
     <DashboardLayout>
@@ -96,7 +96,7 @@ export default function OverviewPage() {
           <SectionHeader title="Exportations — Portefeuille Produits" subtitle="Production & marchés clés" />
           <DataTable
             headers={["Produit", "Volume", "Marchés Principaux", "Part"]}
-            rows={exports.map(d => [
+            rows={exportProducts.map(d => [
               <span className="font-semibold">{d.product}</span>,
               d.volume,
               <span className="text-muted-foreground text-xs">{d.mainMarkets}</span>,

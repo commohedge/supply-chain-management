@@ -8,7 +8,7 @@ const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px 
 
 export default function MarketPage() {
   const { config } = useDashboardData();
-  const { kpis, prices, inventory, demandByRegion, competitors, netback, supplyDemand, competitorDetails } = config.market;
+  const { kpis = [], prices = [], inventory = [], demandByRegion = [], competitors = [], netback = [], supplyDemand = [], competitorDetails = [] } = config.market;
 
   return (
     <DashboardLayout>
