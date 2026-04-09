@@ -55,6 +55,59 @@ export interface FlowsData {
   tradeRoutes: { origin: string; destination: string; product: string; volume: string; transitDays: string }[];
 }
 
+export interface PortData {
+  name: string;
+  location: string;
+  capacityMt: number;
+  currentUtilization: string;
+  products: string;
+  status: "Opérationnel" | "Maintenance" | "Limité";
+}
+
+export interface ExportProductData {
+  name: string;
+  category: string;
+  annualCapacity: string;
+  currentPrice: string;
+  mainMarkets: string;
+  unit: string;
+}
+
+export interface ImportMaterialData {
+  name: string;
+  category: string;
+  annualVolume: string;
+  currentPrice: string;
+  mainSuppliers: string;
+  usage: string;
+}
+
+export interface SupplierData {
+  name: string;
+  country: string;
+  zone: string;
+  products: string;
+  contractType: string;
+  rating: string;
+}
+
+export interface ClientData {
+  name: string;
+  country: string;
+  zone: string;
+  products: string;
+  annualVolume: string;
+  contractType: string;
+}
+
+export interface ReferentielData {
+  ports: PortData[];
+  exportProducts: ExportProductData[];
+  importMaterials: ImportMaterialData[];
+  suppliers: SupplierData[];
+  clients: ClientData[];
+}
+
 export interface DashboardConfig {
   general: { companyName: string; dashboardDate: string; currency: string };
   overview: OverviewData;
@@ -63,6 +116,7 @@ export interface DashboardConfig {
   market: MarketData;
   optionality: OptionalityData;
   flows: FlowsData;
+  referentiel: ReferentielData;
 }
 
 // ── Default Data (Real OCP Data) ──────────────────────────────
