@@ -5,7 +5,7 @@ import {
   TrendingUp,
   Clock,
   Ship,
-  Menu,
+  Settings,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -22,6 +22,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const navItems = [
   { title: "Supply Chain Overview", url: "/", icon: LayoutDashboard },
@@ -36,6 +37,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { config } = useDashboardData();
 
   return (
     <Sidebar collapsible="icon">
@@ -46,7 +48,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div>
-              <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">COMMO<span className="text-primary">HEDGE</span></div>
+              <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">{config.general.companyName.slice(0, 5)}<span className="text-primary">{config.general.companyName.slice(5)}</span></div>
               <div className="text-[10px] text-sidebar-foreground uppercase tracking-widest">Dashboard</div>
             </div>
           )}
@@ -76,10 +78,24 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-sidebar-border">
+      <SidebarFooter className="border-t border-sidebar-border">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/settings"
+                className="hover:bg-sidebar-accent/50 transition-colors"
+                activeClassName="bg-sidebar-accent text-primary font-medium"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                {!collapsed && <span className="text-sm">Configuration</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         {!collapsed && (
-          <div className="text-[10px] text-sidebar-foreground/40 uppercase tracking-wider">
-            Status as of 02/04/2026
+          <div className="px-4 pb-4 pt-2 text-[10px] text-sidebar-foreground/40 uppercase tracking-wider">
+            Status as of {config.general.dashboardDate}
           </div>
         )}
       </SidebarFooter>
