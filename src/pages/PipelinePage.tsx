@@ -8,7 +8,7 @@ const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px 
 
 export default function PipelinePage() {
   const { config } = useDashboardData();
-  const { kpis, coverage, maturity, destinations, statusRows, clientsByRegion } = config.pipeline;
+  const { kpis = [], coverage = [], maturity = [], destinations = [], statusRows = [], clientsByRegion = [] } = config.pipeline;
 
   return (
     <DashboardLayout>

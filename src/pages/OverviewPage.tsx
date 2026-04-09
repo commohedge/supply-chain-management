@@ -9,7 +9,7 @@ const ttStyle = {
 
 export default function OverviewPage() {
   const { config } = useDashboardData();
-  const { kpis, storage, demand, forecast, imports, exports } = config.overview;
+  const { kpis = [], storage = [], demand = [], forecast = [], imports = [], exports: exportProducts = [] } = config.overview;
 
   return (
     <DashboardLayout>
