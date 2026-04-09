@@ -338,7 +338,13 @@ function loadConfig(): DashboardConfig {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return { ...defaultConfig, ...JSON.parse(stored) };
+      const parsed = JSON.parse(stored);
+      // Deep merge each section to ensure new fields have defaults
+      const merged = { ...defaultConfig };
+      for (const key of Object.keys(defaultConfig) as (keyof DashboardConfig)[]) {
+        merged[key] = { ...defaultConfig[key], ...(parsed[key] || {}) } as any;
+      }
+      return merged;
     }
   } catch {}
   return defaultConfig;
