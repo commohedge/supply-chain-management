@@ -8,14 +8,14 @@ const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px 
 
 export default function SupplyPage() {
   const { config } = useDashboardData();
-  const { kpis, production, volumeByStatus, ports, vessels, constraints } = config.supply;
+  const { kpis, production, volumeByStatus, ports, vessels, constraints, rawMaterials } = config.supply;
 
   return (
     <DashboardLayout>
       <div className="page-header">
         <div>
           <h1 className="page-title">Supply & Execution</h1>
-          <p className="page-subtitle">Production, loading capacity, vessels — OCP</p>
+          <p className="page-subtitle">Production, capacité de chargement, navires & matières premières — OCP</p>
         </div>
       </div>
 
@@ -27,11 +27,11 @@ export default function SupplyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Production Forecast" subtitle="By port (kt)" />
+          <SectionHeader title="Forecast Production" subtitle="Par mois (kt) — Tous sites OCP" />
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={production}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
-              <XAxis dataKey="month" tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
+              <XAxis dataKey="month" tick={{ fill: "hsl(0,0%,55%)", fontSize: 10 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <Tooltip {...ttStyle} />
               <Bar dataKey="volume" name="Volume (kt)" fill="hsl(72,100%,50%)" radius={[4,4,0,0]} />
@@ -40,7 +40,7 @@ export default function SupplyPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Volume by Status" subtitle={`Next 30 days — Total: ${(volumeByStatus.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
+          <SectionHeader title="Volume par Statut" subtitle={`30 prochains jours — Total: ${(volumeByStatus.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
           <div className="flex items-center gap-6">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
@@ -66,42 +66,57 @@ export default function SupplyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Loading Capacity by Port" />
+          <SectionHeader title="Capacité de Chargement par Port" />
           <DataTable
-            headers={["Port", "Utilization", "Next 7 Days", "Next 30 Days"]}
+            headers={["Port", "Utilisation", "7 Prochains Jours", "30 Prochains Jours"]}
             rows={ports.map(p => [p.port, p.utilization, p.next7, p.next30])}
           />
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Vessels Available" subtitle={`${vessels.inPort + vessels.atSea + vessels.charterOptions} Total`} />
+          <SectionHeader title="Flotte de Navires" subtitle={`${vessels.inPort + vessels.atSea + vessels.charterOptions} Total`} />
           <div className="grid grid-cols-3 gap-4 mt-4">
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-info">{vessels.inPort}</div>
-              <div className="text-xs text-muted-foreground mt-1">In Port (Loading)</div>
+              <div className="text-xs text-muted-foreground mt-1">En Port (Chargement)</div>
             </div>
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-primary">{vessels.atSea}</div>
-              <div className="text-xs text-muted-foreground mt-1">At Sea (En route)</div>
+              <div className="text-xs text-muted-foreground mt-1">En Mer (En route)</div>
             </div>
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-warning">{vessels.charterOptions}</div>
-              <div className="text-xs text-muted-foreground mt-1">Charter Options</div>
+              <div className="text-xs text-muted-foreground mt-1">Options Charter</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="chart-container">
-        <SectionHeader title="Constraints to Watch" />
-        <DataTable
-          headers={["Constraint", "Details", "Severity"]}
-          rows={constraints.map(c => [
-            <span className="font-semibold">{c.constraint}</span>,
-            c.details,
-            <StatusBadge severity={c.severity} />,
-          ])}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="chart-container">
+          <SectionHeader title="Prix Matières Premières" subtitle="Coûts des intrants critiques" />
+          <DataTable
+            headers={["Matière", "Prix Actuel", "vs 30J", "Tendance"]}
+            rows={rawMaterials.map(r => [
+              <span className="font-semibold">{r.material}</span>,
+              <span className="font-mono">{r.currentPrice}</span>,
+              <span className={r.vs30d.includes("▲") ? "kpi-change-up" : "kpi-change-down"}>{r.vs30d}</span>,
+              <span className={`status-badge ${r.trend.includes("Forte") || r.trend === "Hausse" ? "status-high" : r.trend === "Stable" ? "status-low" : "status-medium"}`}>{r.trend}</span>,
+            ])}
+          />
+        </div>
+
+        <div className="chart-container">
+          <SectionHeader title="Contraintes à Surveiller" />
+          <DataTable
+            headers={["Contrainte", "Détails", "Sévérité"]}
+            rows={constraints.map(c => [
+              <span className="font-semibold">{c.constraint}</span>,
+              <span className="text-xs">{c.details}</span>,
+              <StatusBadge severity={c.severity} />,
+            ])}
+          />
+        </div>
       </div>
     </DashboardLayout>
   );

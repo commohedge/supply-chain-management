@@ -44,12 +44,12 @@ export function AppSidebar() {
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-            CH
+            OCP
           </div>
           {!collapsed && (
             <div>
-              <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">{config.general.companyName.slice(0, 5)}<span className="text-primary">{config.general.companyName.slice(5)}</span></div>
-              <div className="text-[10px] text-sidebar-foreground uppercase tracking-widest">Dashboard</div>
+              <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">{config.general.companyName}</div>
+              <div className="text-[10px] text-sidebar-foreground uppercase tracking-widest">Monitoring Dashboard</div>
             </div>
           )}
         </div>

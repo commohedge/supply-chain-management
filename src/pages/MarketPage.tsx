@@ -3,19 +3,19 @@ import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/Dashbo
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 
-const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)"];
+const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)", "hsl(280,70%,50%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function MarketPage() {
   const { config } = useDashboardData();
-  const { kpis, prices, inventory, demandByRegion, competitors, netback, supplyDemand } = config.market;
+  const { kpis, prices, inventory, demandByRegion, competitors, netback, supplyDemand, competitorDetails } = config.market;
 
   return (
     <DashboardLayout>
       <div className="page-header">
         <div>
           <h1 className="page-title">Market & Value</h1>
-          <p className="page-subtitle">Demand, pricing, netback & competitive landscape</p>
+          <p className="page-subtitle">Demande, pricing, netback & paysage concurrentiel — Phosphates mondiaux</p>
         </div>
       </div>
 
@@ -27,12 +27,12 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Price Benchmarks" subtitle="$/t, FOB" />
+          <SectionHeader title="Benchmark Prix" subtitle="$/t, FOB — DAP Tampa / DAP India / FOB Jorf" />
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={prices}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
               <XAxis dataKey="period" tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
-              <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} domain={[500, 720]} />
+              <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} domain={[480, 680]} />
               <Tooltip {...ttStyle} />
               <Legend wrapperStyle={{ fontSize: 11, color: "hsl(0,0%,55%)" }} />
               <Line type="monotone" dataKey="tampa" name="DAP Tampa" stroke="hsl(72,100%,50%)" strokeWidth={2} dot={{ r: 3 }} />
@@ -43,7 +43,7 @@ export default function MarketPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Demand by Region (2026)" subtitle={`Total: ${(demandByRegion.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
+          <SectionHeader title="Demande par Région (2026)" subtitle={`Total: ${(demandByRegion.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
@@ -57,7 +57,7 @@ export default function MarketPage() {
               {demandByRegion.map((d, i) => (
                 <div key={d.name} className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-sm" style={{ background: COLORS[i % COLORS.length] }} />
-                  <span className="text-muted-foreground w-20">{d.name}</span>
+                  <span className="text-muted-foreground w-28">{d.name}</span>
                   <span className="font-mono">{(d.value / 1000).toFixed(1)} Mt</span>
                 </div>
               ))}
@@ -68,7 +68,7 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Inventory Levels" subtitle="Days of supply" />
+          <SectionHeader title="Niveaux d'Inventaire" subtitle="Jours de supply" />
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={inventory}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -77,20 +77,20 @@ export default function MarketPage() {
               <Tooltip {...ttStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Line type="monotone" dataKey="global" name="Global" stroke="hsl(72,100%,50%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="india" name="India" stroke="hsl(199,89%,48%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="brazil" name="Brazil" stroke="hsl(38,92%,50%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="na" name="N. America" stroke="hsl(142,71%,45%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="india" name="Inde" stroke="hsl(199,89%,48%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="brazil" name="Brésil" stroke="hsl(38,92%,50%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="na" name="Amérique du Nord" stroke="hsl(142,71%,45%)" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Competitor Exports (2026e)" subtitle="Mt" />
+          <SectionHeader title="Exports Concurrents (2026e)" subtitle="Mt — Parts de marché phosphates" />
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={competitors} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
               <XAxis type="number" tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
-              <YAxis type="category" dataKey="name" tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} width={70} />
+              <YAxis type="category" dataKey="name" tick={{ fill: "hsl(0,0%,55%)", fontSize: 10 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} width={100} />
               <Tooltip {...ttStyle} />
               <Bar dataKey="volume" name="Volume (Mt)" fill="hsl(72,100%,50%)" radius={[0,4,4,0]} />
             </BarChart>
@@ -98,28 +98,41 @@ export default function MarketPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Netback Overview" subtitle="$/t" />
+          <SectionHeader title="Netback par Marché" subtitle="$/t — FOB Jorf Lasfar" />
           <DataTable
-            headers={["Market", "FOB Jorf", "Freight", "DAP Price", "Netback", "vs 30D"]}
-            rows={[
-              ...netback.map(n => [n.market, n.fobJorf, n.freight, n.dapPrice, n.netback, <span className="kpi-change-up">{n.vs30d}</span>]),
-              [<span className="font-bold">Average</span>, <span className="font-bold">$530</span>, <span className="font-bold">$91</span>, <span className="font-bold">$610</span>, <span className="font-bold">$615</span>, <span className="font-bold kpi-change-up">+4.8%</span>],
-            ]}
+            headers={["Marché", "FOB Jorf", "Fret", "Prix DAP", "Netback", "vs 30J"]}
+            rows={netback.map(n => [
+              n.market, n.fobJorf, n.freight, n.dapPrice, n.netback,
+              <span className="kpi-change-up">{n.vs30d}</span>,
+            ])}
           />
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Supply / Demand Balance" subtitle="Mt P₂O₅" />
+          <SectionHeader title="Balance Offre / Demande" subtitle="Mt P₂O₅ — Mondial" />
           <DataTable
-            headers={["Category", "2025A", "2026E", "vs 2025"]}
-            rows={[
-              ...supplyDemand.map(s => [s.category, s.y2025, s.y2026e, <span className="kpi-change-up">{s.vs2025}</span>]),
-              [<span className="font-bold">Balance</span>, <span className="font-bold">0.9</span>, <span className="font-bold">1.0</span>, <span className="font-bold kpi-change-up">+11.1%</span>],
-            ]}
+            headers={["Catégorie", "2025A", "2026E", "vs 2025"]}
+            rows={supplyDemand.map(s => [
+              s.category, s.y2025, s.y2026e,
+              <span className="kpi-change-up">{s.vs2025}</span>,
+            ])}
           />
         </div>
+      </div>
+
+      <div className="chart-container">
+        <SectionHeader title="Analyse Concurrentielle Détaillée" subtitle="Principaux rivaux OCP sur le marché mondial" />
+        <DataTable
+          headers={["Concurrent", "Pays", "Part de Marché", "Forces / Avantages"]}
+          rows={competitorDetails.map(c => [
+            <span className="font-semibold text-primary">{c.name}</span>,
+            c.country,
+            <span className="font-mono">{c.marketShare}</span>,
+            <span className="text-xs text-muted-foreground">{c.strengths}</span>,
+          ])}
+        />
       </div>
     </DashboardLayout>
   );
