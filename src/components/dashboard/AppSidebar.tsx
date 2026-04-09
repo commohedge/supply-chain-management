@@ -5,6 +5,7 @@ import {
   TrendingUp,
   Clock,
   Ship,
+  Globe2,
   Database,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -31,6 +32,7 @@ const navItems = [
   { title: "Market & Value", url: "/market", icon: TrendingUp },
   { title: "Optionality & Timing", url: "/optionality", icon: Clock },
   { title: "Global Flows", url: "/flows", icon: Ship },
+  { title: "Carte BI", url: "/map", icon: Globe2 },
 ];
 
 export function AppSidebar() {
