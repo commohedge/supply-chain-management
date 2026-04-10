@@ -34,7 +34,6 @@ const navItems = [
   { title: "Optionality & Timing", url: "/optionality", icon: Clock },
   { title: "Global Flows", url: "/flows", icon: Ship },
   { title: "Carte BI", url: "/map", icon: Globe2 },
-  { title: "Freight Simulator", url: "/freight", icon: Anchor },
 ];
 
 export function AppSidebar() {
@@ -84,6 +83,18 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/freight"
+                className="hover:bg-sidebar-accent/50 transition-colors"
+                activeClassName="bg-sidebar-accent text-primary font-medium"
+              >
+                <Anchor className="mr-2 h-4 w-4" />
+                {!collapsed && <span className="text-sm">Freight Simulator</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink
