@@ -87,6 +87,18 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink
+                to="/freight"
+                className="hover:bg-sidebar-accent/50 transition-colors"
+                activeClassName="bg-sidebar-accent text-primary font-medium"
+              >
+                <Anchor className="mr-2 h-4 w-4" />
+                {!collapsed && <span className="text-sm">Freight Simulator</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
                 to="/settings"
                 className="hover:bg-sidebar-accent/50 transition-colors"
                 activeClassName="bg-sidebar-accent text-primary font-medium"
