@@ -7,6 +7,7 @@ import {
   Ship,
   Globe2,
   Database,
+  Anchor,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
