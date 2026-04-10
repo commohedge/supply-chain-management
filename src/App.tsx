@@ -11,6 +11,7 @@ import MarketPage from "./pages/MarketPage";
 import OptionalityPage from "./pages/OptionalityPage";
 import FlowsPage from "./pages/FlowsPage";
 import MapPage from "./pages/MapPage";
+import FreightSimulatorPage from "./pages/FreightSimulatorPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/optionality" element={<OptionalityPage />} />
             <Route path="/flows" element={<FlowsPage />} />
             <Route path="/map" element={<MapPage />} />
+            <Route path="/freight" element={<FreightSimulatorPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

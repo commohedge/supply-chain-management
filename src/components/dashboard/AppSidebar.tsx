@@ -33,6 +33,7 @@ const navItems = [
   { title: "Optionality & Timing", url: "/optionality", icon: Clock },
   { title: "Global Flows", url: "/flows", icon: Ship },
   { title: "Carte BI", url: "/map", icon: Globe2 },
+  { title: "Freight Simulator", url: "/freight", icon: Anchor },
 ];
 
 export function AppSidebar() {
