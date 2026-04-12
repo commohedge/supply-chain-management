@@ -58,13 +58,15 @@ export function StatusBadge({ severity }: { severity: "high" | "medium" | "low" 
   return <span className={`status-badge ${cls}`}>{severity.charAt(0).toUpperCase() + severity.slice(1)}</span>;
 }
 
-export function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+export function SectionHeader({ title, subtitle }: { title: string; subtitle?: ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-4">
       <div className="accent-dot" />
       <div>
         <h3 className="section-title">{title}</h3>
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+        {subtitle != null && subtitle !== "" && (
+          <div className="text-xs text-muted-foreground mt-0.5">{subtitle}</div>
+        )}
       </div>
     </div>
   );

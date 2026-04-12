@@ -2,11 +2,13 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function OptionalityPage() {
+  const { t } = useI18n();
   const { config } = useDashboardData();
   const { kpis, forwardCurve, optionValue, openDest, floatingStock, scenarios } = config.optionality;
 
@@ -14,8 +16,8 @@ export default function OptionalityPage() {
     <DashboardLayout>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Optionality & Timing</h1>
-          <p className="page-subtitle">Forward curves, option value & floating stock analysis</p>
+          <h1 className="page-title">{t("nav.optionality")}</h1>
+          <p className="page-subtitle">{t("optionality.subtitle")}</p>
         </div>
       </div>
 
@@ -27,7 +29,7 @@ export default function OptionalityPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Forward Price Curve" subtitle="$/t, FOB Jorf Lasfar" />
+          <SectionHeader title={t("optionality.forwardTitle")} subtitle={t("optionality.forwardSubtitle")} />
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={forwardCurve}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -35,22 +37,22 @@ export default function OptionalityPage() {
               <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} domain={[400, 720]} />
               <Tooltip {...ttStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="current" name="Current" stroke="hsl(72,100%,50%)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(72,100%,50%)" }} />
-              <Line type="monotone" dataKey="m1" name="1 Month Ago" stroke="hsl(199,89%,48%)" strokeWidth={1.5} strokeDasharray="5 5" dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="m3" name="3 Months Ago" stroke="hsl(0,0%,45%)" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="current" name={t("optionality.lineCurrent")} stroke="hsl(72,100%,50%)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(72,100%,50%)" }} />
+              <Line type="monotone" dataKey="m1" name={t("optionality.lineM1")} stroke="hsl(199,89%,48%)" strokeWidth={1.5} strokeDasharray="5 5" dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="m3" name={t("optionality.lineM3")} stroke="hsl(0,0%,45%)" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Option Value by Delivery Window" subtitle="$/t" />
+          <SectionHeader title={t("optionality.optionTitle")} subtitle={t("optionality.optionSubtitle")} />
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={optionValue}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
               <XAxis dataKey="period" tick={{ fill: "hsl(0,0%,55%)", fontSize: 10 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <Tooltip {...ttStyle} />
-              <Bar dataKey="value" name="Option Value ($/t)" fill="hsl(72,100%,50%)" radius={[4,4,0,0]} />
+              <Bar dataKey="value" name={t("optionality.barOptionValue")} fill="hsl(72,100%,50%)" radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -58,7 +60,10 @@ export default function OptionalityPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Open Destination Volume by Region" subtitle={`Total: ${openDest.reduce((s, d) => s + d.value, 0).toFixed(1)} Mt`} />
+          <SectionHeader
+            title={t("optionality.openDestTitle")}
+            subtitle={t("optionality.openDestSubtitle", { total: openDest.reduce((s, d) => s + d.value, 0).toFixed(1) })}
+          />
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
@@ -81,25 +86,35 @@ export default function OptionalityPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Floating Stock Duration" subtitle="Days" />
+          <SectionHeader title={t("optionality.floatingTitle")} subtitle={t("optionality.floatingSubtitle")} />
           <DataTable
-            headers={["Region", "Current", "vs Last 30 Days", "vs Last Year"]}
+            headers={[
+              t("optionality.floatCol.region"),
+              t("optionality.floatCol.current"),
+              t("optionality.floatCol.vs30"),
+              t("optionality.floatCol.vsYear"),
+            ]}
             rows={[
               ...floatingStock.map(f => [
                 f.region, f.current,
                 <span className={f.vs30d.includes("▲") ? "kpi-change-up" : "kpi-change-down"}>{f.vs30d}</span>,
                 <span className={f.vsLastYear.includes("▲") ? "kpi-change-up" : "kpi-change-down"}>{f.vsLastYear}</span>,
               ]),
-              [<span className="font-bold">Global</span>, <span className="font-bold">61</span>, <span className="font-bold kpi-change-up">▲ +4</span>, <span className="font-bold kpi-change-down">▼ -7</span>],
+              [<span className="font-bold">{t("optionality.globalLabel")}</span>, <span className="font-bold">61</span>, <span className="font-bold kpi-change-up">▲ +4</span>, <span className="font-bold kpi-change-down">▼ -7</span>],
             ]}
           />
         </div>
       </div>
 
       <div className="chart-container">
-        <SectionHeader title="Optionality Scenarios — Netback Impact" subtitle="$/t" />
+        <SectionHeader title={t("optionality.scenariosTitle")} subtitle={t("optionality.scenariosSubtitle")} />
         <DataTable
-          headers={["Scenario", "Assumption", "Netback Impact", "vs Base"]}
+          headers={[
+            t("optionality.scenCol.scenario"),
+            t("optionality.scenCol.assumption"),
+            t("optionality.scenCol.impact"),
+            t("optionality.scenCol.vsBase"),
+          ]}
           rows={scenarios.map(s => [
             <span className={`font-semibold ${s.scenario === "Upside" ? "text-success" : s.scenario === "Downside" ? "text-destructive" : ""}`}>{s.scenario}</span>,
             s.assumption,
@@ -107,7 +122,7 @@ export default function OptionalityPage() {
             <span className={s.vsBase.includes("+") ? "kpi-change-up" : s.vsBase.includes("-") ? "kpi-change-down" : ""}>{s.vsBase}</span>,
           ])}
         />
-        <p className="mt-4 text-xs text-muted-foreground italic">*Option value represents the estimated value of keeping destinations open, based on the volatility of the forward curve and historical price movements.</p>
+        <p className="mt-4 text-xs text-muted-foreground italic">{t("optionality.footnote")}</p>
       </div>
     </DashboardLayout>
   );

@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/theme-provider";
+import { I18nProvider } from "@/contexts/I18nContext";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 import OverviewPage from "./pages/OverviewPage";
 import SupplyPage from "./pages/SupplyPage";
@@ -13,32 +15,38 @@ import FlowsPage from "./pages/FlowsPage";
 import MapPage from "./pages/MapPage";
 import FreightSimulatorPage from "./pages/FreightSimulatorPage";
 import SettingsPage from "./pages/SettingsPage";
+import DataPage from "./pages/DataPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <DashboardDataProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<OverviewPage />} />
-            <Route path="/supply" element={<SupplyPage />} />
-            <Route path="/pipeline" element={<PipelinePage />} />
-            <Route path="/market" element={<MarketPage />} />
-            <Route path="/optionality" element={<OptionalityPage />} />
-            <Route path="/flows" element={<FlowsPage />} />
-            <Route path="/map" element={<MapPage />} />
-            <Route path="/freight" element={<FreightSimulatorPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </DashboardDataProvider>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="futura-ui-theme">
+      <I18nProvider>
+        <TooltipProvider>
+          <DashboardDataProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<OverviewPage />} />
+                <Route path="/supply" element={<SupplyPage />} />
+                <Route path="/pipeline" element={<PipelinePage />} />
+                <Route path="/market" element={<MarketPage />} />
+                <Route path="/optionality" element={<OptionalityPage />} />
+                <Route path="/flows" element={<FlowsPage />} />
+                <Route path="/map" element={<MapPage />} />
+                <Route path="/data" element={<DataPage />} />
+                <Route path="/freight" element={<FreightSimulatorPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </DashboardDataProvider>
+        </TooltipProvider>
+      </I18nProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

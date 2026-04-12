@@ -2,11 +2,13 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { KpiCard, DataTable, SectionHeader, StatusBadge } from "@/components/dashboard/DashboardWidgets";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(0,0%,45%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function SupplyPage() {
+  const { t } = useI18n();
   const { config } = useDashboardData();
   const { kpis = [], production = [], volumeByStatus = [], ports = [], vessels = { inPort: 0, atSea: 0, charterOptions: 0 }, constraints = [], rawMaterials = [] } = config.supply;
 
@@ -14,8 +16,8 @@ export default function SupplyPage() {
     <DashboardLayout>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Supply & Execution</h1>
-          <p className="page-subtitle">Production, capacité de chargement, navires & matières premières — OCP</p>
+          <h1 className="page-title">{t("nav.supply")}</h1>
+          <p className="page-subtitle">{t("supply.subtitle")}</p>
         </div>
       </div>
 
@@ -27,20 +29,25 @@ export default function SupplyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Forecast Production" subtitle="Par mois (kt) — Tous sites OCP" />
+          <SectionHeader title={t("supply.forecastTitle")} subtitle={t("supply.forecastSubtitle")} />
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={production}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
               <XAxis dataKey="month" tick={{ fill: "hsl(0,0%,55%)", fontSize: 10 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <Tooltip {...ttStyle} />
-              <Bar dataKey="volume" name="Volume (kt)" fill="hsl(72,100%,50%)" radius={[4,4,0,0]} />
+              <Bar dataKey="volume" name={t("supply.barVolume")} fill="hsl(72,100%,50%)" radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Volume par Statut" subtitle={`30 prochains jours — Total: ${(volumeByStatus.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
+          <SectionHeader
+            title={t("supply.volumeStatusTitle")}
+            subtitle={t("supply.volumeStatusSubtitle", {
+              total: (volumeByStatus.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1),
+            })}
+          />
           <div className="flex items-center gap-6">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
@@ -66,27 +73,30 @@ export default function SupplyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Capacité de Chargement par Port" />
+          <SectionHeader title={t("supply.portsTitle")} />
           <DataTable
-            headers={["Port", "Utilisation", "7 Prochains Jours", "30 Prochains Jours"]}
+            headers={[t("supply.portsCol.port"), t("supply.portsCol.util"), t("supply.portsCol.7d"), t("supply.portsCol.30d")]}
             rows={ports.map(p => [p.port, p.utilization, p.next7, p.next30])}
           />
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Flotte de Navires" subtitle={`${vessels.inPort + vessels.atSea + vessels.charterOptions} Total`} />
+          <SectionHeader
+            title={t("supply.fleetTitle")}
+            subtitle={t("supply.fleetTotal", { n: vessels.inPort + vessels.atSea + vessels.charterOptions })}
+          />
           <div className="grid grid-cols-3 gap-4 mt-4">
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-info">{vessels.inPort}</div>
-              <div className="text-xs text-muted-foreground mt-1">En Port (Chargement)</div>
+              <div className="text-xs text-muted-foreground mt-1">{t("supply.vesselInPort")}</div>
             </div>
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-primary">{vessels.atSea}</div>
-              <div className="text-xs text-muted-foreground mt-1">En Mer (En route)</div>
+              <div className="text-xs text-muted-foreground mt-1">{t("supply.vesselAtSea")}</div>
             </div>
             <div className="rounded-lg border border-border p-4 text-center">
               <div className="text-2xl font-mono font-bold text-warning">{vessels.charterOptions}</div>
-              <div className="text-xs text-muted-foreground mt-1">Options Charter</div>
+              <div className="text-xs text-muted-foreground mt-1">{t("supply.charterOptions")}</div>
             </div>
           </div>
         </div>
@@ -94,9 +104,9 @@ export default function SupplyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="chart-container">
-          <SectionHeader title="Prix Matières Premières" subtitle="Coûts des intrants critiques" />
+          <SectionHeader title={t("supply.rawPricesTitle")} subtitle={t("supply.rawPricesSubtitle")} />
           <DataTable
-            headers={["Matière", "Prix Actuel", "vs 30J", "Tendance"]}
+            headers={[t("supply.rawCol.material"), t("supply.rawCol.price"), t("supply.rawCol.vs30"), t("supply.rawCol.trend")]}
             rows={rawMaterials.map(r => [
               <span className="font-semibold">{r.material}</span>,
               <span className="font-mono">{r.currentPrice}</span>,
@@ -107,9 +117,9 @@ export default function SupplyPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Contraintes à Surveiller" />
+          <SectionHeader title={t("supply.constraintsTitle")} />
           <DataTable
-            headers={["Contrainte", "Détails", "Sévérité"]}
+            headers={[t("supply.constCol.name"), t("supply.constCol.details"), t("supply.constCol.severity")]}
             rows={constraints.map(c => [
               <span className="font-semibold">{c.constraint}</span>,
               <span className="text-xs">{c.details}</span>,

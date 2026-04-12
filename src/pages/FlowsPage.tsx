@@ -1,8 +1,10 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { SectionHeader, DataTable } from "@/components/dashboard/DashboardWidgets";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function FlowsPage() {
+  const { t } = useI18n();
   const { config } = useDashboardData();
   const { arbitrage = [], insights = [], tradeRoutes = [] } = config.flows;
 
@@ -10,15 +12,21 @@ export default function FlowsPage() {
     <DashboardLayout>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Global Flows & Arbitrage</h1>
-          <p className="page-subtitle">Optimisation des flux, stratégies d'arbitrage & intelligence compétitive — OCP</p>
+          <h1 className="page-title">{t("flows.pageTitle")}</h1>
+          <p className="page-subtitle">{t("flows.subtitle")}</p>
         </div>
       </div>
 
       <div className="chart-container mb-8">
-        <SectionHeader title="Routes Commerciales Principales" subtitle="Flux physiques OCP — Ports d'origine vers destinations" />
+        <SectionHeader title={t("flows.routesTitle")} subtitle={t("flows.routesSubtitle")} />
         <DataTable
-          headers={["Origine", "Destination", "Produit", "Volume/Trim.", "Transit (jours)"]}
+          headers={[
+            t("flows.routesCol.origin"),
+            t("flows.routesCol.dest"),
+            t("flows.routesCol.product"),
+            t("flows.routesCol.vol"),
+            t("flows.routesCol.transit"),
+          ]}
           rows={tradeRoutes.map(d => [
             <span className="font-semibold text-primary">{d.origin}</span>,
             d.destination,
@@ -30,9 +38,14 @@ export default function FlowsPage() {
       </div>
 
       <div className="chart-container mb-8">
-        <SectionHeader title="Matrice d'Opportunités d'Arbitrage" subtitle="Stratégies clés — Inspiré des modèles Trafigura, Glencore, Vitol" />
+        <SectionHeader title={t("flows.arbitrageTitle")} subtitle={t("flows.arbitrageSubtitle")} />
         <DataTable
-          headers={["Stratégie", "Description", "Exemple OCP", "Levier"]}
+          headers={[
+            t("flows.arbCol.strategy"),
+            t("flows.arbCol.desc"),
+            t("flows.arbCol.example"),
+            t("flows.arbCol.lever"),
+          ]}
           rows={arbitrage.map(d => [
             <span className="font-semibold text-primary">{d.type}</span>,
             <span className="text-xs">{d.description}</span>,

@@ -2,11 +2,13 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)", "hsl(280,70%,50%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function MarketPage() {
+  const { t } = useI18n();
   const { config } = useDashboardData();
   const { kpis = [], prices = [], inventory = [], demandByRegion = [], competitors = [], netback = [], supplyDemand = [], competitorDetails = [] } = config.market;
 
@@ -14,8 +16,8 @@ export default function MarketPage() {
     <DashboardLayout>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Market & Value</h1>
-          <p className="page-subtitle">Demande, pricing, netback & paysage concurrentiel — Phosphates mondiaux</p>
+          <h1 className="page-title">{t("nav.market")}</h1>
+          <p className="page-subtitle">{t("market.subtitle")}</p>
         </div>
       </div>
 
@@ -27,7 +29,7 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Benchmark Prix" subtitle="$/t, FOB — DAP Tampa / DAP India / FOB Jorf" />
+          <SectionHeader title={t("market.benchmarkTitle")} subtitle={t("market.benchmarkSubtitle")} />
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={prices}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -43,7 +45,12 @@ export default function MarketPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Demande par Région (2026)" subtitle={`Total: ${(demandByRegion.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
+          <SectionHeader
+            title={t("market.demandRegionTitle")}
+            subtitle={t("market.demandRegionSubtitle", {
+              total: (demandByRegion.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1),
+            })}
+          />
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={250}>
               <PieChart>
@@ -68,7 +75,7 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Niveaux d'Inventaire" subtitle="Jours de supply" />
+          <SectionHeader title={t("market.inventoryTitle")} subtitle={t("market.inventorySubtitle")} />
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={inventory}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -76,23 +83,23 @@ export default function MarketPage() {
               <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} domain={[10, 80]} />
               <Tooltip {...ttStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="global" name="Global" stroke="hsl(72,100%,50%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="india" name="Inde" stroke="hsl(199,89%,48%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="brazil" name="Brésil" stroke="hsl(38,92%,50%)" strokeWidth={2} />
-              <Line type="monotone" dataKey="na" name="Amérique du Nord" stroke="hsl(142,71%,45%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="global" name={t("market.lineGlobal")} stroke="hsl(72,100%,50%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="india" name={t("market.lineIndia")} stroke="hsl(199,89%,48%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="brazil" name={t("market.lineBrazil")} stroke="hsl(38,92%,50%)" strokeWidth={2} />
+              <Line type="monotone" dataKey="na" name={t("market.lineNA")} stroke="hsl(142,71%,45%)" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Exports Concurrents (2026e)" subtitle="Mt — Parts de marché phosphates" />
+          <SectionHeader title={t("market.competitorsTitle")} subtitle={t("market.competitorsSubtitle")} />
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={competitors} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
               <XAxis type="number" tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
               <YAxis type="category" dataKey="name" tick={{ fill: "hsl(0,0%,55%)", fontSize: 10 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} width={100} />
               <Tooltip {...ttStyle} />
-              <Bar dataKey="volume" name="Volume (Mt)" fill="hsl(72,100%,50%)" radius={[0,4,4,0]} />
+              <Bar dataKey="volume" name={t("market.barVolumeMt")} fill="hsl(72,100%,50%)" radius={[0,4,4,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -100,9 +107,16 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Netback par Marché" subtitle="$/t — FOB Jorf Lasfar" />
+          <SectionHeader title={t("market.netbackTitle")} subtitle={t("market.netbackSubtitle")} />
           <DataTable
-            headers={["Marché", "FOB Jorf", "Fret", "Prix DAP", "Netback", "vs 30J"]}
+            headers={[
+              t("market.netbackHeaders.market"),
+              t("market.netbackHeaders.fob"),
+              t("market.netbackHeaders.freight"),
+              t("market.netbackHeaders.dap"),
+              t("market.netbackHeaders.netback"),
+              t("market.netbackHeaders.vs30"),
+            ]}
             rows={netback.map(n => [
               n.market, n.fobJorf, n.freight, n.dapPrice, n.netback,
               <span className="kpi-change-up">{n.vs30d}</span>,
@@ -111,9 +125,14 @@ export default function MarketPage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Balance Offre / Demande" subtitle="Mt P₂O₅ — Mondial" />
+          <SectionHeader title={t("market.balanceTitle")} subtitle={t("market.balanceSubtitle")} />
           <DataTable
-            headers={["Catégorie", "2025A", "2026E", "vs 2025"]}
+            headers={[
+              t("market.balanceCol.category"),
+              t("market.balanceCol.y2025"),
+              t("market.balanceCol.y2026"),
+              t("market.balanceCol.vs"),
+            ]}
             rows={supplyDemand.map(s => [
               s.category, s.y2025, s.y2026e,
               <span className="kpi-change-up">{s.vs2025}</span>,
@@ -123,9 +142,14 @@ export default function MarketPage() {
       </div>
 
       <div className="chart-container">
-        <SectionHeader title="Analyse Concurrentielle Détaillée" subtitle="Principaux rivaux OCP sur le marché mondial" />
+        <SectionHeader title={t("market.competitorDetailTitle")} subtitle={t("market.competitorDetailSubtitle")} />
         <DataTable
-          headers={["Concurrent", "Pays", "Part de Marché", "Forces / Avantages"]}
+          headers={[
+            t("market.compCol.name"),
+            t("market.compCol.country"),
+            t("market.compCol.share"),
+            t("market.compCol.strengths"),
+          ]}
           rows={competitorDetails.map(c => [
             <span className="font-semibold text-primary">{c.name}</span>,
             c.country,

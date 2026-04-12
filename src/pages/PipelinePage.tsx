@@ -2,11 +2,13 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)", "hsl(280,70%,50%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function PipelinePage() {
+  const { t } = useI18n();
   const { config } = useDashboardData();
   const { kpis = [], coverage = [], maturity = [], destinations = [], statusRows = [], clientsByRegion = [] } = config.pipeline;
 
@@ -14,8 +16,8 @@ export default function PipelinePage() {
     <DashboardLayout>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Sales Pipeline</h1>
-          <p className="page-subtitle">Niveau d'engagement, couverture, destinations & clients — OCP</p>
+          <h1 className="page-title">{t("nav.pipeline")}</h1>
+          <p className="page-subtitle">{t("pipeline.subtitle")}</p>
         </div>
       </div>
 
@@ -27,7 +29,7 @@ export default function PipelinePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="chart-container">
-          <SectionHeader title="Couverture Pipeline" subtitle="Jours de ventes — Objectif: 60-65 jours" />
+          <SectionHeader title={t("pipeline.coverageTitle")} subtitle={t("pipeline.coverageSubtitle")} />
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={coverage}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -40,7 +42,12 @@ export default function PipelinePage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Destinations Confirmées" subtitle={`30 prochains jours — Total: ${(destinations.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1)} Mt`} />
+          <SectionHeader
+            title={t("pipeline.destinationsTitle")}
+            subtitle={t("pipeline.destinationsSubtitle", {
+              total: (destinations.reduce((s, d) => s + d.value, 0) / 1000).toFixed(1),
+            })}
+          />
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="45%" height={250}>
               <PieChart>
@@ -65,7 +72,7 @@ export default function PipelinePage() {
       </div>
 
       <div className="chart-container mb-8">
-        <SectionHeader title="Maturité du Volume par Période de Chargement" />
+        <SectionHeader title={t("pipeline.maturityTitle")} />
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={maturity} barGap={2}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(0,0%,16%)" />
@@ -73,18 +80,24 @@ export default function PipelinePage() {
             <YAxis tick={{ fill: "hsl(0,0%,55%)", fontSize: 11 }} axisLine={{ stroke: "hsl(0,0%,16%)" }} />
             <Tooltip {...ttStyle} />
             <Legend wrapperStyle={{ fontSize: 11, color: "hsl(0,0%,55%)" }} />
-            <Bar dataKey="confirmed" name="Confirmé" fill="hsl(72,100%,50%)" radius={[4,4,0,0]} stackId="a" />
-            <Bar dataKey="unassigned" name="Non Assigné" fill="hsl(199,89%,48%)" radius={[0,0,0,0]} stackId="a" />
-            <Bar dataKey="openDest" name="Open Dest." fill="hsl(38,92%,50%)" radius={[4,4,0,0]} stackId="a" />
+            <Bar dataKey="confirmed" name={t("pipeline.barConfirmed")} fill="hsl(72,100%,50%)" radius={[4,4,0,0]} stackId="a" />
+            <Bar dataKey="unassigned" name={t("pipeline.barUnassigned")} fill="hsl(199,89%,48%)" radius={[0,0,0,0]} stackId="a" />
+            <Bar dataKey="openDest" name={t("pipeline.barOpenDest")} fill="hsl(38,92%,50%)" radius={[4,4,0,0]} stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="chart-container">
-          <SectionHeader title="Pipeline par Statut" subtitle="30 prochains jours" />
+          <SectionHeader title={t("pipeline.statusTitle")} subtitle={t("pipeline.statusSubtitle")} />
           <DataTable
-            headers={["Statut", "Volume (kt)", "% du Total", "vs Mois Dernier", "Netback Moy. ($/t)"]}
+            headers={[
+              t("pipeline.statusCol.status"),
+              t("pipeline.statusCol.vol"),
+              t("pipeline.statusCol.pct"),
+              t("pipeline.statusCol.vsLast"),
+              t("pipeline.statusCol.netback"),
+            ]}
             rows={[
               ...statusRows.map(r => [
                 r.status, r.volume, r.pct,
@@ -92,7 +105,7 @@ export default function PipelinePage() {
                 r.netback,
               ]),
               [
-                <span className="font-bold">Total</span>,
+                <span className="font-bold">{t("pipeline.statusTotal")}</span>,
                 <span className="font-bold">{statusRows.reduce((s, r) => s + parseInt(r.volume.replace(/,/g, "")), 0).toLocaleString()}</span>,
                 <span className="font-bold">100%</span>,
                 <span className="font-bold kpi-change-up">▲ +7%</span>,
@@ -103,9 +116,14 @@ export default function PipelinePage() {
         </div>
 
         <div className="chart-container">
-          <SectionHeader title="Clients Clés par Région" subtitle="Répartition des ventes OCP" />
+          <SectionHeader title={t("pipeline.clientsTitle")} subtitle={t("pipeline.clientsSubtitle")} />
           <DataTable
-            headers={["Région", "Part", "Clients Clés", "Produits"]}
+            headers={[
+              t("pipeline.clientsCol.region"),
+              t("pipeline.clientsCol.share"),
+              t("pipeline.clientsCol.clients"),
+              t("pipeline.clientsCol.products"),
+            ]}
             rows={clientsByRegion.map(c => [
               <span className="font-semibold text-primary">{c.region}</span>,
               <span className="font-mono">{c.share}</span>,

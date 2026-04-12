@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import type { LogisticsMappings } from "@/types/logistics";
+import { DEFAULT_FLOATING_HUBS } from "@/types/logistics";
+import { migrateReferentielAndMappingsToEnglish } from "@/i18n/referenceLocale";
 
 // ── Types ──────────────────────────────────────────────────────
 export interface OverviewData {
@@ -61,7 +64,7 @@ export interface PortData {
   capacityMt: number;
   currentUtilization: string;
   products: string;
-  status: "Opérationnel" | "Maintenance" | "Limité";
+  status: "Operational" | "Maintenance" | "Limited";
 }
 
 export interface ExportProductData {
@@ -108,6 +111,14 @@ export interface ReferentielData {
   clients: ClientData[];
 }
 
+/** Affichage des navires logistique sur la carte (positions Data / Carte) */
+export interface MapLogisticsDisplay {
+  /** Afficher les marqueurs navire aux coordonnées Lat/Long des lignes logistique */
+  showLogisticsVessels: boolean;
+  /** Produits à inclure — vide = tous les produits transportés */
+  vesselProductFilter: string[];
+}
+
 export interface DashboardConfig {
   general: { companyName: string; dashboardDate: string; currency: string };
   overview: OverviewData;
@@ -117,6 +128,10 @@ export interface DashboardConfig {
   optionality: OptionalityData;
   flows: FlowsData;
   referentiel: ReferentielData;
+  /** Listes déroulantes + floating hubs carte — Data / Carte logistique */
+  logisticsMappings: LogisticsMappings;
+  /** Couche navires logistique (lignes monitoring) sur la carte */
+  mapLogisticsDisplay: MapLogisticsDisplay;
 }
 
 // ── Default Data (Real OCP Data) ──────────────────────────────
@@ -376,48 +391,73 @@ const defaultConfig: DashboardConfig = {
   },
   referentiel: {
     ports: [
-      { name: "Jorf Lasfar", location: "El Jadida, Maroc", capacityMt: 23, currentUtilization: "82%", products: "DAP, MAP, TSP, Acide Phosphorique", status: "Opérationnel" },
-      { name: "Safi", location: "Safi, Maroc", capacityMt: 10, currentUtilization: "71%", products: "NPK, NPS, DAP", status: "Opérationnel" },
-      { name: "Casablanca", location: "Casablanca, Maroc", capacityMt: 5, currentUtilization: "63%", products: "TSP, Roche Phosphatée", status: "Opérationnel" },
-      { name: "Laâyoune", location: "Laâyoune, Maroc", capacityMt: 4, currentUtilization: "45%", products: "Acide Phosphorique, Roche", status: "Opérationnel" },
-      { name: "Bayóvar", location: "Piura, Pérou", capacityMt: 3.9, currentUtilization: "58%", products: "Roche Phosphatée", status: "Opérationnel" },
+      { name: "Jorf Lasfar", location: "El Jadida, Morocco", capacityMt: 23, currentUtilization: "82%", products: "DAP, MAP, TSP, Phosphoric Acid", status: "Operational" },
+      { name: "Safi", location: "Safi, Morocco", capacityMt: 10, currentUtilization: "71%", products: "NPK, NPS, DAP", status: "Operational" },
+      { name: "Casablanca", location: "Casablanca, Morocco", capacityMt: 5, currentUtilization: "63%", products: "TSP, Phosphate rock", status: "Operational" },
+      { name: "Laâyoune", location: "Laâyoune, Morocco", capacityMt: 4, currentUtilization: "45%", products: "Phosphoric Acid, Rock", status: "Operational" },
+      { name: "Bayóvar", location: "Piura, Peru", capacityMt: 3.9, currentUtilization: "58%", products: "Phosphate rock", status: "Operational" },
     ],
     exportProducts: [
-      { name: "DAP (Diammonium Phosphate)", category: "Engrais phosphaté", annualCapacity: "~4.2 Mt", currentPrice: "$610/t", mainMarkets: "Inde, Brésil, Afrique", unit: "Mt" },
-      { name: "MAP (Monoammonium Phosphate)", category: "Engrais phosphaté", annualCapacity: "~2.8 Mt", currentPrice: "$575/t", mainMarkets: "Brésil, Argentine", unit: "Mt" },
-      { name: "Acide Phosphorique (H₃PO₄)", category: "Produit intermédiaire", annualCapacity: "~3.1 Mt", currentPrice: "$780/t P₂O₅", mainMarkets: "Inde, Europe", unit: "Mt P₂O₅" },
-      { name: "TSP (Triple Superphosphate)", category: "Engrais phosphaté", annualCapacity: "~1.2 Mt", currentPrice: "$420/t", mainMarkets: "Europe, Afrique", unit: "Mt" },
-      { name: "NPK / NPS", category: "Engrais composé", annualCapacity: "~0.8 Mt", currentPrice: "$490/t", mainMarkets: "Afrique (sols spécifiques)", unit: "Mt" },
-      { name: "Roche Phosphatée", category: "Matière première", annualCapacity: "~3.5 Mt export", currentPrice: "$110/t", mainMarkets: "Divers", unit: "Mt" },
+      { name: "DAP (Diammonium Phosphate)", category: "Phosphate fertilizer", annualCapacity: "~4.2 Mt", currentPrice: "$610/t", mainMarkets: "India, Brazil, Africa", unit: "Mt" },
+      { name: "MAP (Monoammonium Phosphate)", category: "Phosphate fertilizer", annualCapacity: "~2.8 Mt", currentPrice: "$575/t", mainMarkets: "Brazil, Argentina", unit: "Mt" },
+      { name: "Phosphoric Acid (H₃PO₄)", category: "Intermediate product", annualCapacity: "~3.1 Mt", currentPrice: "$780/t P₂O₅", mainMarkets: "India, Europe", unit: "Mt P₂O₅" },
+      { name: "TSP (Triple Superphosphate)", category: "Phosphate fertilizer", annualCapacity: "~1.2 Mt", currentPrice: "$420/t", mainMarkets: "Europe, Africa", unit: "Mt" },
+      { name: "NPK / NPS", category: "Compound fertilizer", annualCapacity: "~0.8 Mt", currentPrice: "$490/t", mainMarkets: "Africa (specific soils)", unit: "Mt" },
+      { name: "Phosphate rock", category: "Raw material", annualCapacity: "~3.5 Mt export", currentPrice: "$110/t", mainMarkets: "Various", unit: "Mt" },
     ],
     importMaterials: [
-      { name: "Soufre (Sulfur)", category: "Intrant critique", annualVolume: "~8.3 Mt/an", currentPrice: "$142/t CFR Maroc", mainSuppliers: "QatarEnergy, ADNOC, Aramco, Gazprom", usage: "Acide sulfurique → attaque roche phosphatée" },
-      { name: "Ammoniac (NH₃)", category: "Intrant critique", annualVolume: "~2.5 Mt/an", currentPrice: "$385/t CFR Maroc", mainSuppliers: "Trinité-et-Tobago, CF Industries, EuroChem", usage: "Production DAP/MAP (engrais azotés-phosphorés)" },
-      { name: "Potasse (KCl)", category: "Intrant secondaire", annualVolume: "Variable", currentPrice: "$290/t CFR", mainSuppliers: "Nutrien (Canada), Producteurs européens", usage: "Engrais ternaires (NPK)" },
-      { name: "Fuel / Énergie", category: "Énergie", annualVolume: "Variable", currentPrice: "Variable", mainSuppliers: "ONEE, marché international", usage: "Procédés industriels, transport" },
+      { name: "Sulfur (Sulfur)", category: "Critical input", annualVolume: "~8.3 Mt/year", currentPrice: "$142/t CFR Morocco", mainSuppliers: "QatarEnergy, ADNOC, Aramco, Gazprom", usage: "Sulfuric acid → attack on phosphate rock" },
+      { name: "Ammonia (NH₃)", category: "Critical input", annualVolume: "~2.5 Mt/year", currentPrice: "$385/t CFR Morocco", mainSuppliers: "Trinidad and Tobago, CF Industries, EuroChem", usage: "DAP/MAP production (nitrogen-phosphate fertilizers)" },
+      { name: "Potash (KCl)", category: "Secondary input", annualVolume: "Variable", currentPrice: "$290/t CFR", mainSuppliers: "Nutrien (Canada), European producers", usage: "Ternary fertilizers (NPK)" },
+      { name: "Fuel / Energy", category: "Energy", annualVolume: "Variable", currentPrice: "Variable", mainSuppliers: "ONEE, international market", usage: "Industrial processes, transport" },
     ],
     suppliers: [
-      { name: "QatarEnergy", country: "Qatar", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
-      { name: "ADNOC", country: "Émirats Arabes Unis", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
-      { name: "Saudi Aramco", country: "Arabie Saoudite", zone: "Moyen-Orient", products: "Soufre", contractType: "Long-terme", rating: "A+" },
-      { name: "Gazprom", country: "Russie", zone: "Europe / CEI", products: "Soufre", contractType: "Spot + Contrat", rating: "B+" },
-      { name: "CF Industries", country: "États-Unis", zone: "Amérique du Nord", products: "Ammoniac", contractType: "Contrat annuel", rating: "A" },
-      { name: "Trinidad Nitrogen", country: "Trinité-et-Tobago", zone: "Amérique du Nord", products: "Ammoniac", contractType: "Long-terme", rating: "A" },
-      { name: "EuroChem", country: "Suisse / Russie", zone: "Europe / CEI", products: "Ammoniac", contractType: "Spot", rating: "B+" },
-      { name: "Nutrien", country: "Canada", zone: "Amérique du Nord", products: "Potasse (KCl)", contractType: "Contrat annuel", rating: "A" },
-      { name: "Fertiberia", country: "Espagne", zone: "Europe", products: "Ammoniac", contractType: "Spot", rating: "B" },
+      { name: "QatarEnergy", country: "Qatar", zone: "Middle East", products: "Sulfur", contractType: "Long-term", rating: "A+" },
+      { name: "ADNOC", country: "United Arab Emirates", zone: "Middle East", products: "Sulfur", contractType: "Long-term", rating: "A+" },
+      { name: "Saudi Aramco", country: "Saudi Arabia", zone: "Middle East", products: "Sulfur", contractType: "Long-term", rating: "A+" },
+      { name: "Gazprom", country: "Russia", zone: "Europe / CIS", products: "Sulfur", contractType: "Spot + Contract", rating: "B+" },
+      { name: "CF Industries", country: "United States", zone: "North America", products: "Ammonia", contractType: "Annual contract", rating: "A" },
+      { name: "Trinidad Nitrogen", country: "Trinidad and Tobago", zone: "North America", products: "Ammonia", contractType: "Long-term", rating: "A" },
+      { name: "EuroChem", country: "Switzerland / Russia", zone: "Europe / CIS", products: "Ammonia", contractType: "Spot", rating: "B+" },
+      { name: "Nutrien", country: "Canada", zone: "North America", products: "Potash (KCl)", contractType: "Annual contract", rating: "A" },
+      { name: "Fertiberia", country: "Spain", zone: "Europe", products: "Ammonia", contractType: "Spot", rating: "B" },
     ],
     clients: [
-      { name: "Coromandel International", country: "Inde", zone: "Asie du Sud", products: "DAP, Acide Phosphorique", annualVolume: "~1.2 Mt", contractType: "Long-terme" },
-      { name: "IFFCO", country: "Inde", zone: "Asie du Sud", products: "DAP", annualVolume: "~0.8 Mt", contractType: "Long-terme" },
-      { name: "RCF (Rashtriya Chemicals)", country: "Inde", zone: "Asie du Sud", products: "DAP, Acide Phosphorique", annualVolume: "~0.5 Mt", contractType: "Contrat annuel" },
-      { name: "Yara Brasil", country: "Brésil", zone: "Amérique Latine", products: "MAP, DAP", annualVolume: "~0.9 Mt", contractType: "Contrat annuel" },
-      { name: "Mosaic Fertilizantes", country: "Brésil", zone: "Amérique Latine", products: "MAP", annualVolume: "~0.6 Mt", contractType: "Spot + Contrat" },
-      { name: "Gouvernement Éthiopie", country: "Éthiopie", zone: "Afrique de l'Est", products: "NPK/NPS", annualVolume: "~0.4 Mt", contractType: "Contrat gouvernemental" },
-      { name: "Gouvernement Nigeria", country: "Nigeria", zone: "Afrique de l'Ouest", products: "NPK", annualVolume: "~0.3 Mt", contractType: "Contrat gouvernemental" },
-      { name: "Groupe Roullier", country: "France", zone: "Europe", products: "Acide Phosphorique, TSP", annualVolume: "~0.2 Mt", contractType: "Contrat annuel" },
-      { name: "Koch Fertilizer", country: "États-Unis", zone: "Amérique du Nord", products: "DAP", annualVolume: "~0.15 Mt", contractType: "Spot" },
+      { name: "Coromandel International", country: "India", zone: "South Asia", products: "DAP, Phosphoric Acid", annualVolume: "~1.2 Mt", contractType: "Long-term" },
+      { name: "IFFCO", country: "India", zone: "South Asia", products: "DAP", annualVolume: "~0.8 Mt", contractType: "Long-term" },
+      { name: "RCF (Rashtriya Chemicals)", country: "India", zone: "South Asia", products: "DAP, Phosphoric Acid", annualVolume: "~0.5 Mt", contractType: "Annual contract" },
+      { name: "Yara Brasil", country: "Brazil", zone: "Latin America", products: "MAP, DAP", annualVolume: "~0.9 Mt", contractType: "Annual contract" },
+      { name: "Mosaic Fertilizantes", country: "Brazil", zone: "Latin America", products: "MAP", annualVolume: "~0.6 Mt", contractType: "Spot + Contract" },
+      { name: "Ethiopia Government", country: "Ethiopia", zone: "East Africa", products: "NPK/NPS", annualVolume: "~0.4 Mt", contractType: "Government contract" },
+      { name: "Nigeria Government", country: "Nigeria", zone: "West Africa", products: "NPK", annualVolume: "~0.3 Mt", contractType: "Government contract" },
+      { name: "Groupe Roullier", country: "France", zone: "Europe", products: "Phosphoric Acid, TSP", annualVolume: "~0.2 Mt", contractType: "Annual contract" },
+      { name: "Koch Fertilizer", country: "United States", zone: "North America", products: "DAP", annualVolume: "~0.15 Mt", contractType: "Spot" },
     ],
+  },
+  logisticsMappings: {
+    destinationCountries: [
+      "Brazil", "India", "USA", "Mexico", "Pakistan", "Australia", "Europe", "Morocco",
+      "Nigeria", "Kenya", "Turkey", "Bangladesh",
+    ],
+    productCodes: ["DAP", "MAP", "TSP", "NPK", "Phosphoric Acid", "NPS"],
+    vesselStatuses: [
+      "To Morocco",
+      "Loading Open",
+      "Loading",
+      "Loading Sold",
+      "Transit Open",
+      "Transit Sold",
+      "Transit Subsidiary",
+      "Transit",
+      "Floating Storage",
+      "Regional Hub",
+      "Line Up",
+    ],
+    floatingHubs: DEFAULT_FLOATING_HUBS,
+  },
+  mapLogisticsDisplay: {
+    showLogisticsVessels: false,
+    vesselProductFilter: [],
   },
 };
 
@@ -437,15 +477,43 @@ function loadConfig(): DashboardConfig {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
+      const parsed = JSON.parse(stored) as Partial<DashboardConfig> & {
+        flows?: { floatingHubs?: { id: string; name: string; lat: number; lng: number }[] };
+      };
       // Deep merge each section to ensure new fields have defaults
       const merged = { ...defaultConfig };
       for (const key of Object.keys(defaultConfig) as (keyof DashboardConfig)[]) {
-        merged[key] = { ...defaultConfig[key], ...(parsed[key] || {}) } as any;
+        const k = key;
+        merged[k] = { ...defaultConfig[k], ...(parsed[k] ?? {}) } as DashboardConfig[typeof k];
+      }
+      // Migrer floating hubs depuis flows (ancien emplacement) si jamais sauvegardés dans logisticsMappings
+      const pLm = parsed.logisticsMappings;
+      const hadFloatingHubsKey = Boolean(pLm && Object.prototype.hasOwnProperty.call(pLm, "floatingHubs"));
+      const legacyHubs = parsed.flows?.floatingHubs;
+      if (!hadFloatingHubsKey && Array.isArray(legacyHubs) && legacyHubs.length > 0) {
+        merged.logisticsMappings = { ...merged.logisticsMappings, floatingHubs: legacyHubs };
+      }
+      if (!Array.isArray(merged.logisticsMappings.floatingHubs)) {
+        merged.logisticsMappings = { ...merged.logisticsMappings, floatingHubs: DEFAULT_FLOATING_HUBS };
+      }
+      // Retirer floatingHubs de flows si présent (données héritées)
+      if (merged.flows && "floatingHubs" in (merged.flows as object)) {
+        const { floatingHubs: _drop, ...restFlows } = merged.flows as FlowsData & { floatingHubs?: unknown };
+        merged.flows = restFlows;
+      }
+      const migrated = migrateReferentielAndMappingsToEnglish(merged.referentiel, merged.logisticsMappings);
+      merged.referentiel = migrated.referentiel;
+      merged.logisticsMappings = migrated.logisticsMappings;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      } catch {
+        /* quota / private mode */
       }
       return merged;
     }
-  } catch {}
+  } catch {
+    /* localStorage illisible ou JSON invalide */
+  }
   return defaultConfig;
 }
 
@@ -487,3 +555,4 @@ export function useDashboardData() {
 }
 
 export { defaultConfig };
+export type { FloatingHub } from "@/types/logistics";

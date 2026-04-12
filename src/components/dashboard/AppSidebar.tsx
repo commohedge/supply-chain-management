@@ -8,6 +8,7 @@ import {
   Globe2,
   Database,
   Anchor,
+  FileSpreadsheet,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -25,18 +26,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const navItems = [
-  { title: "Supply Chain Overview", url: "/", icon: LayoutDashboard },
-  { title: "Supply & Execution", url: "/supply", icon: Package },
-  { title: "Sales Pipeline", url: "/pipeline", icon: ShoppingCart },
-  { title: "Market & Value", url: "/market", icon: TrendingUp },
-  { title: "Optionality & Timing", url: "/optionality", icon: Clock },
-  { title: "Global Flows", url: "/flows", icon: Ship },
-  { title: "Carte BI", url: "/map", icon: Globe2 },
-];
+  { titleKey: "nav.overview", url: "/", icon: LayoutDashboard },
+  { titleKey: "nav.supply", url: "/supply", icon: Package },
+  { titleKey: "nav.pipeline", url: "/pipeline", icon: ShoppingCart },
+  { titleKey: "nav.market", url: "/market", icon: TrendingUp },
+  { titleKey: "nav.optionality", url: "/optionality", icon: Clock },
+  { titleKey: "nav.flows", url: "/flows", icon: Ship },
+  { titleKey: "nav.map", url: "/map", icon: Globe2 },
+  { titleKey: "nav.data", url: "/data", icon: FileSpreadsheet },
+] as const;
 
 export function AppSidebar() {
+  const { t } = useI18n();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
@@ -52,14 +56,14 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">{config.general.companyName}</div>
-              <div className="text-[10px] text-sidebar-foreground uppercase tracking-widest">Monitoring Dashboard</div>
+              <div className="text-[10px] text-sidebar-foreground uppercase tracking-widest">{t("layout.monitoringDashboard")}</div>
             </div>
           )}
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50">Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50">{t("nav.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
@@ -72,7 +76,7 @@ export function AppSidebar() {
                       activeClassName="bg-sidebar-accent text-primary font-medium"
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span className="text-sm">{item.title}</span>}
+                      {!collapsed && <span className="text-sm">{t(item.titleKey)}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -91,7 +95,7 @@ export function AppSidebar() {
                 activeClassName="bg-sidebar-accent text-primary font-medium"
               >
                 <Anchor className="mr-2 h-4 w-4" />
-                {!collapsed && <span className="text-sm">Freight Simulator</span>}
+                {!collapsed && <span className="text-sm">{t("nav.freight")}</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -103,14 +107,14 @@ export function AppSidebar() {
                 activeClassName="bg-sidebar-accent text-primary font-medium"
               >
                 <Database className="mr-2 h-4 w-4" />
-                {!collapsed && <span className="text-sm">Référentiel</span>}
+                {!collapsed && <span className="text-sm">{t("nav.settings")}</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         {!collapsed && (
           <div className="px-4 pb-4 pt-2 text-[10px] text-sidebar-foreground/40 uppercase tracking-wider">
-            Status as of {config.general.dashboardDate}
+            {t("nav.statusAsOf")} {config.general.dashboardDate}
           </div>
         )}
       </SidebarFooter>
