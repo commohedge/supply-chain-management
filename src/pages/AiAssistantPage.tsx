@@ -69,7 +69,7 @@ function serializeDashboardData(config: any): string {
 
 export default function AiAssistantPage() {
   const { config } = useDashboardData();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
