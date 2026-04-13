@@ -10,6 +10,7 @@ import {
   Database,
   Anchor,
   FileSpreadsheet,
+  Sparkles,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
