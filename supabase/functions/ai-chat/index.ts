@@ -21,7 +21,7 @@ const ALLOWED_TOPICS = [
   "demande", "demand", "offre", "supply", "pipeline",
 ];
 
-function buildSystemPrompt(style: string, jargon: string, dashboardData: string): string {
+function buildSystemPrompt(style: string, jargon: string, dashboardData: string, locale: string): string {
   const styleInstructions: Record<string, string> = {
     concise: "Réponds de manière très concise, en 2-3 phrases maximum. Va droit au but.",
     detailed: "Fournis des réponses détaillées et structurées avec des explications approfondies, des exemples et du contexte.",
