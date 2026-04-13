@@ -16,6 +16,7 @@ export const fr: Record<string, string> = {
   "nav.map": "Carte BI",
   "nav.data": "Data",
   "nav.freight": "Simulateur fret",
+  "nav.ai": "Expert IA",
   "nav.settings": "Référentiel",
   "nav.navigation": "Navigation",
   "nav.statusAsOf": "État au",

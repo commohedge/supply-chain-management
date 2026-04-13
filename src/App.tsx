@@ -17,6 +17,7 @@ import MapPage from "./pages/MapPage";
 import FreightSimulatorPage from "./pages/FreightSimulatorPage";
 import SettingsPage from "./pages/SettingsPage";
 import DataPage from "./pages/DataPage";
+import AiAssistantPage from "./pages/AiAssistantPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/data" element={<DataPage />} />
                 <Route path="/freight" element={<FreightSimulatorPage />} />
+                <Route path="/ai" element={<AiAssistantPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

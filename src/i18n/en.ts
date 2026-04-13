@@ -18,6 +18,7 @@ export const en: Record<string, string> = {
   "nav.map": "BI Map",
   "nav.data": "Data",
   "nav.freight": "Freight Simulator",
+  "nav.ai": "AI Expert",
   "nav.settings": "Reference data",
   "nav.navigation": "Navigation",
   "nav.statusAsOf": "Status as of",

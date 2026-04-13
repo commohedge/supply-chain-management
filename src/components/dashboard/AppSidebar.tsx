@@ -10,6 +10,7 @@ import {
   Database,
   Anchor,
   FileSpreadsheet,
+  Sparkles,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -86,6 +87,18 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/ai"
+                className="hover:bg-sidebar-accent/50 transition-colors"
+                activeClassName="bg-sidebar-accent text-primary font-medium"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                {!collapsed && <span className="text-sm">{t("nav.ai")}</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink

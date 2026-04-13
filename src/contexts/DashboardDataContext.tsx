@@ -484,7 +484,7 @@ function loadConfig(): DashboardConfig {
       const merged = { ...defaultConfig };
       for (const key of Object.keys(defaultConfig) as (keyof DashboardConfig)[]) {
         const k = key;
-        merged[k] = { ...defaultConfig[k], ...(parsed[k] ?? {}) } as DashboardConfig[typeof k];
+        (merged as any)[k] = { ...defaultConfig[k], ...(parsed[k] ?? {}) };
       }
       // Migrer floating hubs depuis flows (ancien emplacement) si jamais sauvegardés dans logisticsMappings
       const pLm = parsed.logisticsMappings;

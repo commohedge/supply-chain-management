@@ -27,7 +27,7 @@ import {
 import { readImageFileAsDataUrl } from "@/lib/readImageDataUrl";
 import { BrandingLogo } from "@/components/dashboard/BrandingLogo";
 
-function EditableTable<T extends Record<string, unknown>>({
+function EditableTable<T extends Record<string, any>>({
   data,
   columns,
   onUpdate,
