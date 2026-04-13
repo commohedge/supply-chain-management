@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
+import MainDashboardPage from "./pages/MainDashboardPage";
 import OverviewPage from "./pages/OverviewPage";
 import SupplyPage from "./pages/SupplyPage";
 import PipelinePage from "./pages/PipelinePage";
@@ -30,7 +31,8 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<OverviewPage />} />
+                <Route path="/" element={<MainDashboardPage />} />
+                <Route path="/overview" element={<OverviewPage />} />
                 <Route path="/supply" element={<SupplyPage />} />
                 <Route path="/pipeline" element={<PipelinePage />} />
                 <Route path="/market" element={<MarketPage />} />

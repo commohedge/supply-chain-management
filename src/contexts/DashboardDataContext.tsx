@@ -120,7 +120,7 @@ export interface MapLogisticsDisplay {
 }
 
 export interface DashboardConfig {
-  general: { companyName: string; dashboardDate: string; currency: string };
+  general: { companyName: string; dashboardDate: string; currency: string; /** PNG/JPEG/WebP/SVG en data URL */ logoDataUrl: string };
   overview: OverviewData;
   supply: SupplyData;
   pipeline: PipelineData;
@@ -136,7 +136,7 @@ export interface DashboardConfig {
 
 // ── Default Data (Real OCP Data) ──────────────────────────────
 const defaultConfig: DashboardConfig = {
-  general: { companyName: "OCP GROUP", dashboardDate: "09/04/2026", currency: "USD" },
+  general: { companyName: "OCP GROUP", dashboardDate: "09/04/2026", currency: "USD", logoDataUrl: "" },
   overview: {
     kpis: [
       { label: "Production Totale", value: "12.8 Mt", change: "+6.2% vs 2025", changeDirection: "up", subtitle: "Phosphate & Engrais" },

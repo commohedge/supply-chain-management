@@ -3,13 +3,14 @@ import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/Dashbo
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { displayDashboardDataText } from "@/i18n/dashboardDataText";
 
 const ttStyle = {
   contentStyle: { backgroundColor: "hsl(0, 0%, 8%)", border: "1px solid hsl(0, 0%, 16%)", borderRadius: "8px", color: "hsl(0, 0%, 95%)", fontSize: "12px", fontFamily: "JetBrains Mono" },
 };
 
 export default function OverviewPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { config } = useDashboardData();
   const { kpis = [], storage = [], demand = [], forecast = [], imports = [], exports: exportProducts = [] } = config.overview;
 
@@ -25,7 +26,14 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {kpis.map((k, i) => (
-          <KpiCard key={i} label={k.label} value={k.value} change={k.change} changeDirection={k.changeDirection} subtitle={k.subtitle} />
+          <KpiCard
+            key={i}
+            label={displayDashboardDataText(k.label, locale)}
+            value={k.value}
+            change={displayDashboardDataText(k.change, locale)}
+            changeDirection={k.changeDirection}
+            subtitle={k.subtitle ? displayDashboardDataText(k.subtitle, locale) : undefined}
+          />
         ))}
       </div>
 

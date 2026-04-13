@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  LineChart,
   Package,
   ShoppingCart,
   TrendingUp,
@@ -11,7 +12,6 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/sidebar";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { BrandingLogo } from "@/components/dashboard/BrandingLogo";
 
 const navItems = [
-  { titleKey: "nav.overview", url: "/", icon: LayoutDashboard },
+  { titleKey: "nav.dashboard", url: "/", icon: LayoutDashboard },
+  { titleKey: "nav.overview", url: "/overview", icon: LineChart },
   { titleKey: "nav.supply", url: "/supply", icon: Package },
   { titleKey: "nav.pipeline", url: "/pipeline", icon: ShoppingCart },
   { titleKey: "nav.market", url: "/market", icon: TrendingUp },
@@ -43,16 +45,13 @@ export function AppSidebar() {
   const { t } = useI18n();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const { config } = useDashboardData();
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-            OCP
-          </div>
+          <BrandingLogo logoDataUrl={config.general.logoDataUrl} className="h-8 w-8 text-sm" imgClassName="h-8 w-8 max-h-8 max-w-8" />
           {!collapsed && (
             <div>
               <div className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">{config.general.companyName}</div>

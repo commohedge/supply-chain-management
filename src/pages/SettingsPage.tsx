@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, RotateCcw, Save, Database, Anchor, Package, FlaskConical, Users, Building2, Truck, Ship } from "lucide-react";
+import { Trash2, Plus, RotateCcw, Save, Database, Anchor, Package, FlaskConical, Users, Building2, Truck, Ship, ImageIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import type { LogisticsMappings } from "@/types/logistics";
 import { toast } from "sonner";
@@ -24,6 +24,8 @@ import {
   parseLogisticsListItem,
   type ReferenceStringRole,
 } from "@/i18n/referenceLocale";
+import { readImageFileAsDataUrl } from "@/lib/readImageDataUrl";
+import { BrandingLogo } from "@/components/dashboard/BrandingLogo";
 
 function EditableTable<T extends Record<string, unknown>>({
   data,
@@ -167,8 +169,11 @@ export default function SettingsPage() {
   const { config, updateSection, resetAll } = useDashboardData();
   const [local, setLocal] = useState(structuredClone(config.referentiel));
   const [localLogistics, setLocalLogistics] = useState<LogisticsMappings>(() => structuredClone(config.logisticsMappings));
+  const [localGeneral, setLocalGeneral] = useState(() => structuredClone(config.general));
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const save = () => {
+    updateSection("general", localGeneral);
     updateSection("referentiel", local);
     updateSection("logisticsMappings", localLogistics);
     toast.success(t("settings.saved"));
@@ -215,8 +220,9 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="ports" className="w-full">
+      <Tabs defaultValue="general" className="w-full">
         <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/30 p-1 mb-6">
+          <TabsTrigger value="general" className="text-xs flex items-center gap-1.5"><ImageIcon className="h-3.5 w-3.5" /> {t("settings.tab.general")}</TabsTrigger>
           <TabsTrigger value="ports" className="text-xs flex items-center gap-1.5"><Anchor className="h-3.5 w-3.5" /> {t("settings.tab.ports")}</TabsTrigger>
           <TabsTrigger value="exports" className="text-xs flex items-center gap-1.5"><Package className="h-3.5 w-3.5" /> {t("settings.tab.exports")}</TabsTrigger>
           <TabsTrigger value="imports" className="text-xs flex items-center gap-1.5"><FlaskConical className="h-3.5 w-3.5" /> {t("settings.tab.imports")}</TabsTrigger>
@@ -224,6 +230,89 @@ export default function SettingsPage() {
           <TabsTrigger value="clients" className="text-xs flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> {t("settings.tab.clients")}</TabsTrigger>
           <TabsTrigger value="logistics-mapping" className="text-xs flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> {t("settings.tab.logisticsMapping")}</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="general">
+          <div className="chart-container max-w-2xl space-y-6">
+            <SectionHeader title={t("settings.section.general")} subtitle={t("settings.section.generalSub")} />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="settings-company">{t("settings.general.companyName")}</Label>
+                <Input
+                  id="settings-company"
+                  className="max-w-md"
+                  value={localGeneral.companyName}
+                  onChange={(e) => setLocalGeneral((g) => ({ ...g, companyName: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="settings-date">{t("settings.general.dashboardDate")}</Label>
+                  <Input
+                    id="settings-date"
+                    className="font-mono"
+                    value={localGeneral.dashboardDate}
+                    onChange={(e) => setLocalGeneral((g) => ({ ...g, dashboardDate: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="settings-currency">{t("settings.general.currency")}</Label>
+                  <Input
+                    id="settings-currency"
+                    className="font-mono w-32"
+                    value={localGeneral.currency}
+                    onChange={(e) => setLocalGeneral((g) => ({ ...g, currency: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-lg border border-border/60 bg-muted/15 p-4">
+                <Label>{t("settings.logo.label")}</Label>
+                <p className="text-xs text-muted-foreground">{t("settings.logo.hint")}</p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <BrandingLogo logoDataUrl={localGeneral.logoDataUrl} className="h-14 w-14" imgClassName="h-14 w-14" />
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                      className="sr-only"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (!file) return;
+                        try {
+                          const dataUrl = await readImageFileAsDataUrl(file);
+                          setLocalGeneral((g) => ({ ...g, logoDataUrl: dataUrl }));
+                          toast.success(t("settings.logo.uploaded"));
+                        } catch (err) {
+                          const code = err instanceof Error ? err.message : "";
+                          if (code === "too-large") toast.error(t("settings.logo.tooLarge"));
+                          else if (code === "not-image") toast.error(t("settings.logo.notImage"));
+                          else toast.error(t("settings.logo.error"));
+                        }
+                      }}
+                    />
+                    <Button type="button" variant="secondary" size="sm" className="text-xs" onClick={() => logoInputRef.current?.click()}>
+                      <ImageIcon className="h-3.5 w-3.5 mr-1.5" />
+                      {t("settings.logo.choose")}
+                    </Button>
+                    {localGeneral.logoDataUrl ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => setLocalGeneral((g) => ({ ...g, logoDataUrl: "" }))}
+                      >
+                        {t("settings.logo.remove")}
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
 
         {/* PORTS */}
         <TabsContent value="ports">

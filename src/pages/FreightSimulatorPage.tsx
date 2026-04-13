@@ -756,8 +756,8 @@ export default function FreightSimulatorPage() {
                       <th className="text-left min-w-[100px]">{t("freight.col.vesselName")}</th>
                       <th className="text-left min-w-[88px]">{t("freight.col.category")}</th>
                       <th className="text-right min-w-[72px]">{t("freight.table.dwt")}</th>
-                      <th className="text-right min-w-[80px]">Grain (m³)</th>
-                      <th className="text-right min-w-[80px]">Bale (m³)</th>
+                      <th className="text-right min-w-[80px]">{t("freight.table.grain")}</th>
+                      <th className="text-right min-w-[80px]">{t("freight.table.bale")}</th>
                       <th className="w-10" />
                     </tr>
                   </thead>

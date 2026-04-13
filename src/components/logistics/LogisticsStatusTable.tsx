@@ -56,6 +56,8 @@ interface LogisticsStatusTableProps {
   dense?: boolean;
   /** État initial du mode détaillé (colonnes étendues + légende) */
   defaultDetailedMode?: boolean;
+  /** Masquer le titre / sous-titre (ex. titre rendu par la page parent au-dessus) */
+  showHeading?: boolean;
 }
 
 export function LogisticsStatusTable({
@@ -68,6 +70,7 @@ export function LogisticsStatusTable({
   showFooterTotal = true,
   dense = false,
   defaultDetailedMode = false,
+  showHeading = true,
 }: LogisticsStatusTableProps) {
   const { t, locale } = useI18n();
   const title = titleProp ?? t("logistics.titleDefault");
@@ -182,12 +185,14 @@ export function LogisticsStatusTable({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
-          {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
+      <div className={cn("flex flex-wrap items-start justify-between gap-3", !showHeading && "justify-end")}>
+        {showHeading && (
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
+            {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+          </div>
+        )}
+        <div className={cn("flex flex-wrap items-center gap-3", !showHeading && "w-full justify-end sm:w-auto")}>
           <div className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/20 px-2.5 py-1.5">
             <Switch
               id="logistics-detailed-mode"

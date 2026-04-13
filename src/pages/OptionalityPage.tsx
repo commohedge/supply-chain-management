@@ -3,12 +3,13 @@ import { KpiCard, DataTable, SectionHeader } from "@/components/dashboard/Dashbo
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { displayDashboardDataText } from "@/i18n/dashboardDataText";
 
 const COLORS = ["hsl(72,100%,50%)", "hsl(199,89%,48%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(0,0%,45%)"];
 const ttStyle = { contentStyle: { backgroundColor: "hsl(0,0%,8%)", border: "1px solid hsl(0,0%,16%)", borderRadius: "8px", color: "hsl(0,0%,95%)", fontSize: "12px", fontFamily: "JetBrains Mono" } };
 
 export default function OptionalityPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { config } = useDashboardData();
   const { kpis, forwardCurve, optionValue, openDest, floatingStock, scenarios } = config.optionality;
 
@@ -23,7 +24,14 @@ export default function OptionalityPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {kpis.map((k, i) => (
-          <KpiCard key={i} label={k.label} value={k.value} subtitle={k.subtitle} change={k.change} changeDirection={k.changeDirection} />
+          <KpiCard
+            key={i}
+            label={displayDashboardDataText(k.label, locale)}
+            value={k.value}
+            subtitle={k.subtitle ? displayDashboardDataText(k.subtitle, locale) : undefined}
+            change={displayDashboardDataText(k.change, locale)}
+            changeDirection={k.changeDirection}
+          />
         ))}
       </div>
 
