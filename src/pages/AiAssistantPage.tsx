@@ -182,14 +182,25 @@ export default function AiAssistantPage() {
     }
   };
 
-  const suggestions = [
-    "Quel est le stock actuel par pays ?",
-    "Quels sont nos principaux clients ?",
-    "Analyse le netback par marché",
-    "Quels navires sont en mer ?",
-    "Compare les prix DAP vs FOB",
-    "Quels sont les incoterms les plus utilisés ?",
-  ];
+  const isFr = useI18n().locale === "fr";
+
+  const suggestions = isFr
+    ? [
+        "Quel est le stock actuel par pays ?",
+        "Quels sont nos principaux clients ?",
+        "Analyse le netback par marché",
+        "Quels navires sont en mer ?",
+        "Compare les prix DAP vs FOB",
+        "Quels sont les incoterms les plus utilisés ?",
+      ]
+    : [
+        "What is the current stock by country?",
+        "Who are our main clients?",
+        "Analyze netback by market",
+        "Which vessels are at sea?",
+        "Compare DAP vs FOB prices",
+        "What are the most common incoterms?",
+      ];
 
   return (
     <DashboardLayout>
@@ -203,7 +214,7 @@ export default function AiAssistantPage() {
             <div>
               <h1 className="text-lg font-bold text-foreground">AI Commodity Expert</h1>
               <p className="text-xs text-muted-foreground">
-                Phosphates · Énergie · Fertilisants · Supply Chain · Incoterms
+                Phosphates · Energy · Fertilizers · Supply Chain · Incoterms
               </p>
             </div>
           </div>
