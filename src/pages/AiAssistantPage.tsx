@@ -183,7 +183,7 @@ export default function AiAssistantPage() {
     }
   };
 
-  const isFr = useI18n().locale === "fr";
+  const isFr = locale === "fr";
 
   const suggestions = isFr
     ? [
