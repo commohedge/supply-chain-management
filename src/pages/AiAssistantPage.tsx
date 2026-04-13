@@ -107,6 +107,7 @@ export default function AiAssistantPage() {
           style,
           jargon,
           dashboardData,
+          locale,
         }),
       });
 
