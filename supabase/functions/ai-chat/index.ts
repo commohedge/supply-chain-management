@@ -21,40 +21,58 @@ const ALLOWED_TOPICS = [
   "demande", "demand", "offre", "supply", "pipeline",
 ];
 
-function buildSystemPrompt(style: string, jargon: string, dashboardData: string): string {
-  const styleInstructions: Record<string, string> = {
-    concise: "Réponds de manière très concise, en 2-3 phrases maximum. Va droit au but.",
-    detailed: "Fournis des réponses détaillées et structurées avec des explications approfondies, des exemples et du contexte.",
-    long: "Fournis des réponses longues et exhaustives couvrant tous les aspects du sujet, avec analyses, comparaisons et recommandations.",
-  };
+function buildSystemPrompt(style: string, jargon: string, dashboardData: string, locale: string): string {
+  const isFr = locale === "fr";
 
-  const jargonInstructions: Record<string, string> = {
-    simple: "Utilise un langage simple et accessible, évite le jargon technique. Explique les termes spécialisés si nécessaire.",
-    professional: "Utilise un langage professionnel standard du secteur des commodités et de la supply chain.",
-    expert: "Utilise le jargon expert du trading de commodités, du shipping et de la supply chain sans simplification. Termes techniques : TC rate, bunker, laytime, demurrage, netback, FOB, CFR, CIF, DAP, etc.",
-  };
+  const styleInstructions: Record<string, string> = isFr
+    ? {
+        concise: "Réponds de manière très concise, en 2-3 phrases maximum. Va droit au but.",
+        detailed: "Fournis des réponses détaillées et structurées avec des explications approfondies, des exemples et du contexte.",
+        long: "Fournis des réponses longues et exhaustives couvrant tous les aspects du sujet, avec analyses, comparaisons et recommandations.",
+      }
+    : {
+        concise: "Reply very concisely, 2-3 sentences max. Get straight to the point.",
+        detailed: "Provide detailed, structured answers with in-depth explanations, examples and context.",
+        long: "Provide long, exhaustive answers covering all aspects of the topic, with analyses, comparisons and recommendations.",
+      };
 
-  return `Tu es un assistant IA spécialisé exclusivement dans les domaines suivants :
-- Phosphates et produits dérivés (DAP, MAP, TSP, NPK, SSP, acide phosphorique, roche phosphate)
-- Énergie (gaz naturel, pétrole, ammoniac, soufre)
-- Engrais et fertilisants
-- Commodités et matières premières
-- Supply chain et logistique maritime
+  const jargonInstructions: Record<string, string> = isFr
+    ? {
+        simple: "Utilise un langage simple et accessible, évite le jargon technique. Explique les termes spécialisés si nécessaire.",
+        professional: "Utilise un langage professionnel standard du secteur des commodités et de la supply chain.",
+        expert: "Utilise le jargon expert du trading de commodités, du shipping et de la supply chain sans simplification. Termes techniques : TC rate, bunker, laytime, demurrage, netback, FOB, CFR, CIF, DAP, etc.",
+      }
+    : {
+        simple: "Use simple, accessible language. Avoid technical jargon. Explain specialized terms when necessary.",
+        professional: "Use standard professional language from the commodities and supply chain industry.",
+        expert: "Use expert commodity trading, shipping and supply chain jargon without simplification. Technical terms: TC rate, bunker, laytime, demurrage, netback, FOB, CFR, CIF, DAP, etc.",
+      };
+
+  const outOfScope = isFr
+    ? "Je suis spécialisé en phosphates, énergie, fertilisants, commodités, supply chain, logistique et incoterms. Je ne peux pas répondre à cette question."
+    : "I specialize in phosphates, energy, fertilizers, commodities, supply chain, logistics and incoterms. I cannot answer this question.";
+
+  return `You are an AI assistant specialized exclusively in the following domains:
+- Phosphates and derivatives (DAP, MAP, TSP, NPK, SSP, phosphoric acid, phosphate rock)
+- Energy (natural gas, oil, ammonia, sulfur)
+- Fertilizers
+- Commodities and raw materials
+- Supply chain and maritime logistics
 - Incoterms (FOB, CFR, CIF, DAP, DDP, etc.)
-- Trading et marchés internationaux
+- Trading and international markets
 
-RÈGLE ABSOLUE : Tu ne dois JAMAIS répondre à des questions en dehors de ces domaines. Si la question est hors sujet, réponds poliment : "Je suis spécialisé en phosphates, énergie, fertilisants, commodités, supply chain, logistique et incoterms. Je ne peux pas répondre à cette question."
+ABSOLUTE RULE: You must NEVER answer questions outside these domains. If the question is off-topic, reply politely: "${outOfScope}"
 
 ${styleInstructions[style] || styleInstructions.professional}
 ${jargonInstructions[jargon] || jargonInstructions.professional}
 
-Tu as accès aux données du dashboard de l'utilisateur ci-dessous. Utilise-les pour répondre aux questions sur les clients, fournisseurs, stocks, ports, navires, production, marché, etc.
+You have access to the user's dashboard data below. Use it to answer questions about clients, suppliers, stocks, ports, vessels, production, market, etc.
 
-=== DONNÉES DU DASHBOARD ===
+=== DASHBOARD DATA ===
 ${dashboardData}
-=== FIN DES DONNÉES ===
+=== END DATA ===
 
-Réponds dans la même langue que la question posée (français ou anglais).`;
+Reply in ${isFr ? "French" : "English"} by default. If the user writes in the other language, reply in their language.`;
 }
 
 serve(async (req) => {
@@ -63,14 +81,15 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, style, jargon, dashboardData } = await req.json();
+    const { messages, style, jargon, dashboardData, locale } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = buildSystemPrompt(
       style || "professional",
       jargon || "professional",
-      dashboardData || "Aucune donnée disponible"
+      dashboardData || "No data available",
+      locale || "en"
     );
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

@@ -69,7 +69,7 @@ function serializeDashboardData(config: any): string {
 
 export default function AiAssistantPage() {
   const { config } = useDashboardData();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -107,6 +107,7 @@ export default function AiAssistantPage() {
           style,
           jargon,
           dashboardData,
+          locale,
         }),
       });
 
@@ -182,14 +183,25 @@ export default function AiAssistantPage() {
     }
   };
 
-  const suggestions = [
-    "Quel est le stock actuel par pays ?",
-    "Quels sont nos principaux clients ?",
-    "Analyse le netback par marché",
-    "Quels navires sont en mer ?",
-    "Compare les prix DAP vs FOB",
-    "Quels sont les incoterms les plus utilisés ?",
-  ];
+  const isFr = locale === "fr";
+
+  const suggestions = isFr
+    ? [
+        "Quel est le stock actuel par pays ?",
+        "Quels sont nos principaux clients ?",
+        "Analyse le netback par marché",
+        "Quels navires sont en mer ?",
+        "Compare les prix DAP vs FOB",
+        "Quels sont les incoterms les plus utilisés ?",
+      ]
+    : [
+        "What is the current stock by country?",
+        "Who are our main clients?",
+        "Analyze netback by market",
+        "Which vessels are at sea?",
+        "Compare DAP vs FOB prices",
+        "What are the most common incoterms?",
+      ];
 
   return (
     <DashboardLayout>
@@ -203,7 +215,7 @@ export default function AiAssistantPage() {
             <div>
               <h1 className="text-lg font-bold text-foreground">AI Commodity Expert</h1>
               <p className="text-xs text-muted-foreground">
-                Phosphates · Énergie · Fertilisants · Supply Chain · Incoterms
+                Phosphates · Energy · Fertilizers · Supply Chain · Incoterms
               </p>
             </div>
           </div>
@@ -212,7 +224,7 @@ export default function AiAssistantPage() {
               variant="ghost"
               size="icon"
               onClick={() => setMessages([])}
-              title="Effacer la conversation"
+              title={isFr ? "Effacer la conversation" : "Clear conversation"}
             >
               <Eraser className="h-4 w-4" />
             </Button>
@@ -230,28 +242,28 @@ export default function AiAssistantPage() {
         {showSettings && (
           <div className="py-3 px-1 border-b border-border grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground font-medium">Style de réponse</label>
+              <label className="text-xs text-muted-foreground font-medium">{isFr ? "Style de réponse" : "Response style"}</label>
               <Select value={style} onValueChange={setStyle}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="concise">Concis</SelectItem>
+                  <SelectItem value="concise">{isFr ? "Concis" : "Concise"}</SelectItem>
                   <SelectItem value="professional">Standard</SelectItem>
-                  <SelectItem value="detailed">Détaillé</SelectItem>
-                  <SelectItem value="long">Exhaustif</SelectItem>
+                  <SelectItem value="detailed">{isFr ? "Détaillé" : "Detailed"}</SelectItem>
+                  <SelectItem value="long">{isFr ? "Exhaustif" : "Exhaustive"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground font-medium">Jargon</label>
+              <label className="text-xs text-muted-foreground font-medium">{isFr ? "Jargon" : "Jargon level"}</label>
               <Select value={jargon} onValueChange={setJargon}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="simple">Simple / Vulgarisé</SelectItem>
-                  <SelectItem value="professional">Professionnel</SelectItem>
+                  <SelectItem value="simple">{isFr ? "Simple / Vulgarisé" : "Simple / Layman"}</SelectItem>
+                  <SelectItem value="professional">{isFr ? "Professionnel" : "Professional"}</SelectItem>
                   <SelectItem value="expert">Expert / Trading</SelectItem>
                 </SelectContent>
               </Select>
@@ -267,9 +279,13 @@ export default function AiAssistantPage() {
                 <Bot className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-foreground mb-1">Assistant IA Commodités</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-1">
+                  {isFr ? "Assistant IA Commodités" : "AI Commodity Assistant"}
+                </h2>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  Posez vos questions sur les phosphates, l'énergie, les fertilisants, la supply chain, la logistique ou les incoterms. J'ai accès à toutes les données de votre dashboard.
+                  {isFr
+                    ? "Posez vos questions sur les phosphates, l'énergie, les fertilisants, la supply chain, la logistique ou les incoterms. J'ai accès à toutes les données de votre dashboard."
+                    : "Ask questions about phosphates, energy, fertilizers, supply chain, logistics or incoterms. I have access to all your dashboard data."}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center max-w-lg">
@@ -324,7 +340,7 @@ export default function AiAssistantPage() {
               <Card className="bg-muted/50">
                 <CardContent className="p-3 flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">Analyse en cours…</span>
+                  <span className="text-sm text-muted-foreground">{isFr ? "Analyse en cours…" : "Analyzing…"}</span>
                 </CardContent>
               </Card>
             </div>
@@ -341,7 +357,7 @@ export default function AiAssistantPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Posez votre question sur les phosphates, énergie, fertilisants, supply chain..."
+              placeholder={isFr ? "Posez votre question sur les phosphates, énergie, fertilisants, supply chain..." : "Ask about phosphates, energy, fertilizers, supply chain, logistics, incoterms..."}
               className="min-h-[44px] max-h-32 resize-none text-sm"
               rows={1}
             />
@@ -355,7 +371,9 @@ export default function AiAssistantPage() {
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground/60 mt-1.5 text-center">
-            Spécialisé en phosphates, énergie, fertilisants, commodités, supply chain, logistique et incoterms uniquement.
+            {isFr
+              ? "Spécialisé en phosphates, énergie, fertilisants, commodités, supply chain, logistique et incoterms uniquement."
+              : "Specialized in phosphates, energy, fertilizers, commodities, supply chain, logistics and incoterms only."}
           </p>
         </div>
       </div>
