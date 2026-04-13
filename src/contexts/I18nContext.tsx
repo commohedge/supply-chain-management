@@ -28,7 +28,7 @@ type I18nValue = {
   t: (key: string, vars?: Record<string, string | number>) => string;
 };
 
-const I18nContext = createContext<I18nValue | null>(null);
+const I18nContext = createContext<I18nValue | null>(null); // v2
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>(() => {
