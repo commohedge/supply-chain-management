@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/contexts/I18nContext";
 import type { AppLocale } from "@/i18n/locales";
+import { tCountry } from "@/i18n/countryNames";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   BULK_CARRIER_CLASS_SEGMENTS,
@@ -300,16 +301,16 @@ function RouteSimulationCard({
         <div className="flex flex-wrap items-center gap-1.5">
           <Select value={r.origin} onValueChange={(v) => onUpdate(r.id, "origin", v)}>
             <SelectTrigger className="h-7 text-[10px] bg-background/80 min-w-[100px] max-w-[140px]">
-              <SelectValue />
+              <SelectValue>{tCountry(r.origin, locale)}</SelectValue>
             </SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
           </Select>
           <span className="text-[10px] text-muted-foreground">→</span>
           <Select value={r.destination} onValueChange={(v) => onUpdate(r.id, "destination", v)}>
             <SelectTrigger className="h-7 text-[10px] bg-background/80 min-w-[100px] max-w-[140px]">
-              <SelectValue />
+              <SelectValue>{tCountry(r.destination, locale)}</SelectValue>
             </SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </CardHeader>
@@ -620,13 +621,13 @@ export default function FreightSimulatorPage() {
                   <td className="py-2 px-2 sticky left-0 bg-card z-10 border-r border-border">
                     <div className="flex items-center gap-1.5">
                       <Select value={r.origin} onValueChange={v => updateRoute(r.id, "origin", v)}>
-                        <SelectTrigger className="h-6 text-[10px] bg-background/50 w-[62px] px-1.5"><SelectValue /></SelectTrigger>
-                        <SelectContent>{COUNTRIES.map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+                        <SelectTrigger className="h-6 text-[10px] bg-background/50 w-[62px] px-1.5"><SelectValue>{tCountry(r.origin, locale)}</SelectValue></SelectTrigger>
+                        <SelectContent>{COUNTRIES.map(c => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
                       </Select>
                       <span className="text-[9px] text-muted-foreground">→</span>
                       <Select value={r.destination} onValueChange={v => updateRoute(r.id, "destination", v)}>
-                        <SelectTrigger className="h-6 text-[10px] bg-background/50 w-[62px] px-1.5"><SelectValue /></SelectTrigger>
-                        <SelectContent>{COUNTRIES.map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+                        <SelectTrigger className="h-6 text-[10px] bg-background/50 w-[62px] px-1.5"><SelectValue>{tCountry(r.destination, locale)}</SelectValue></SelectTrigger>
+                        <SelectContent>{COUNTRIES.map(c => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </td>
