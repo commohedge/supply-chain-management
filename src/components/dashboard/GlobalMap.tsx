@@ -188,7 +188,6 @@ const COORDS: Record<string, [number, number]> = {
   Bangladesh: [23.69, 90.36],
   Turkey: [38.96, 35.24],
   Turquie: [38.96, 35.24],
-  Mexique: [23.63, -102.55],
 };
 
 /** Icône unique : cercle vert + navire (silhouette type cargo, traits nets) */
