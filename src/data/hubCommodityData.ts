@@ -1,9 +1,13 @@
 import type { CsvDataset } from "@/components/data/CsvImportBlock";
 import type { LogisticsStatusRow } from "@/types/logistics";
-import { buildDefaultLogisticsRows } from "@/data/logisticsSeed";
+import { buildDefaultLogisticsRows, buildLogisticsRowsForMode } from "@/data/logisticsSeed";
 import { fleetMonitoringMeta } from "@/data/bulkVesselsFleet";
 import { coordsNearDestination } from "@/lib/logisticsDestinationCoords";
 import { normalizeEtaPair } from "@/lib/etaDate";
+import type { CommodityMode } from "@/data/commodityPresets";
+
+/** Event dispatché quand on change de commodity preset → les pages rechargent les rows. */
+export const HUB_LOGISTICS_RESEED_EVENT = "hub-logistics-reseeded";
 
 export const HUB_STORAGE_KEY = "hub-commodity-data-v1";
 
@@ -125,4 +129,14 @@ export function saveLogisticsRowsOnly(rows: LogisticsStatusRow[]) {
   full.logisticsRows = rows;
   full.logisticsGeoVersion = LOGISTICS_GEO_VERSION;
   saveHubCommodity(full);
+}
+
+/** Régénère les lignes logistique pour la commodité choisie (preset switch). */
+export function seedLogisticsForMode(mode: CommodityMode) {
+  const rows = buildLogisticsRowsForMode(mode);
+  saveLogisticsRowsOnly(rows);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(HUB_LOGISTICS_RESEED_EVENT, { detail: { mode } }));
+  }
+  return rows;
 }

@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { LogisticsStatusTable } from "@/components/logistics/LogisticsStatusTable";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useI18n } from "@/contexts/I18nContext";
-import { loadHubCommodity, saveLogisticsRowsOnly } from "@/data/hubCommodityData";
+import { HUB_LOGISTICS_RESEED_EVENT, loadHubCommodity, saveLogisticsRowsOnly } from "@/data/hubCommodityData";
 import type { LogisticsStatusRow } from "@/types/logistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -107,6 +107,12 @@ export default function MainDashboardPage() {
   useEffect(() => {
     saveLogisticsRowsOnly(logisticsRows);
   }, [logisticsRows]);
+
+  useEffect(() => {
+    const onReseed = () => setLogisticsRows(loadHubCommodity().logisticsRows);
+    window.addEventListener(HUB_LOGISTICS_RESEED_EVENT, onReseed);
+    return () => window.removeEventListener(HUB_LOGISTICS_RESEED_EVENT, onReseed);
+  }, []);
 
   const totalStockMt = useMemo(() => {
     const kt = storage.reduce((s, x) => s + (x.inStock ?? 0), 0);

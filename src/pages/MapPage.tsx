@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/dashboard/DashboardWidgets";
 import { LogisticsStatusTable } from "@/components/logistics/LogisticsStatusTable";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useI18n } from "@/contexts/I18nContext";
-import { loadHubCommodity, saveLogisticsRowsOnly } from "@/data/hubCommodityData";
+import { HUB_LOGISTICS_RESEED_EVENT, loadHubCommodity, saveLogisticsRowsOnly } from "@/data/hubCommodityData";
 import type { LogisticsStatusRow } from "@/types/logistics";
 
 const GlobalMap = lazy(() => import("@/components/dashboard/GlobalMap"));
@@ -19,6 +19,12 @@ export default function MapPage() {
   useEffect(() => {
     saveLogisticsRowsOnly(logisticsRows);
   }, [logisticsRows]);
+
+  useEffect(() => {
+    const onReseed = () => setLogisticsRows(loadHubCommodity().logisticsRows);
+    window.addEventListener(HUB_LOGISTICS_RESEED_EVENT, onReseed);
+    return () => window.removeEventListener(HUB_LOGISTICS_RESEED_EVENT, onReseed);
+  }, []);
 
   return (
     <DashboardLayout>
