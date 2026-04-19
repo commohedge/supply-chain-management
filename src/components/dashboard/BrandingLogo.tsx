@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
+import commohedgeLogo from "@/assets/commohedge-logo.png";
 
-/** Logo en base64 (data URL) depuis Paramètres ; sinon fallback « OCP ». */
+/** Logo en base64 (data URL) depuis Paramètres ; sinon fallback logo Commohedge. */
 export function BrandingLogo({
   logoDataUrl,
   className,
@@ -10,23 +11,12 @@ export function BrandingLogo({
   className?: string;
   imgClassName?: string;
 }) {
-  if (logoDataUrl) {
-    return (
-      <img
-        src={logoDataUrl}
-        alt=""
-        className={cn("shrink-0 rounded-lg object-contain object-center bg-muted/40", imgClassName, className)}
-      />
-    );
-  }
+  const src = logoDataUrl || commohedgeLogo;
   return (
-    <div
-      className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground",
-        className,
-      )}
-    >
-      OCP
-    </div>
+    <img
+      src={src}
+      alt=""
+      className={cn("shrink-0 rounded-lg object-contain object-center bg-muted/40", imgClassName, className)}
+    />
   );
 }

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 import type { LogisticsMappings } from "@/types/logistics";
 import { DEFAULT_FLOATING_HUBS } from "@/types/logistics";
 import { migrateReferentielAndMappingsToEnglish } from "@/i18n/referenceLocale";
+import type { CommodityMode } from "@/data/commodityPresets";
 
 // ── Types ──────────────────────────────────────────────────────
 export interface OverviewData {
@@ -120,7 +121,15 @@ export interface MapLogisticsDisplay {
 }
 
 export interface DashboardConfig {
-  general: { companyName: string; dashboardDate: string; currency: string; /** PNG/JPEG/WebP/SVG en data URL */ logoDataUrl: string };
+  general: {
+    companyName: string;
+    dashboardDate: string;
+    currency: string;
+    /** PNG/JPEG/WebP/SVG en data URL */
+    logoDataUrl: string;
+    /** Active commodity mode (drives demo data shape across all pages) */
+    commodityMode?: CommodityMode;
+  };
   overview: OverviewData;
   supply: SupplyData;
   pipeline: PipelineData;
@@ -134,9 +143,9 @@ export interface DashboardConfig {
   mapLogisticsDisplay: MapLogisticsDisplay;
 }
 
-// ── Default Data (Real OCP Data) ──────────────────────────────
+// ── Default Data (Commohedge — Phosphates preset) ──────────────────────────────
 const defaultConfig: DashboardConfig = {
-  general: { companyName: "OCP GROUP", dashboardDate: "09/04/2026", currency: "USD", logoDataUrl: "" },
+  general: { companyName: "Commohedge Supply Chain Dashboard", dashboardDate: "09/04/2026", currency: "USD", logoDataUrl: "", commodityMode: "phosphates" },
   overview: {
     kpis: [
       { label: "Production Totale", value: "12.8 Mt", change: "+6.2% vs 2025", changeDirection: "up", subtitle: "Phosphate & Engrais" },
