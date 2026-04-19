@@ -32,7 +32,7 @@ const FR_TO_EN: Record<string, string> = {
   "Ports Jorf + Safi": "Jorf + Safi ports",
   "2.7 Mt capacité": "2.7 Mt capacity",
   "de ventes": "of sales",
-  "Sites OCP (Jorf+Safi+Youssoufia)": "OCP sites (Jorf+Safi+Youssoufia)",
+  "Sites de production (Jorf+Safi+Youssoufia)": "OCP sites (Jorf+Safi+Youssoufia)",
   "vs mois dernier": "vs last month",
   "jours": "days",
   "Jours": "Days",

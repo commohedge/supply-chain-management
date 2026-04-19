@@ -1,4 +1,4 @@
-/** Statut navire / expédition — suivi type OCP Logistics & Shipment */
+/** Statut navire / expédition — suivi Logistics & Shipment */
 
 export interface LogisticsStatusRow {
   id: string;

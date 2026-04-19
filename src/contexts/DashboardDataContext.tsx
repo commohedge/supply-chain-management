@@ -197,7 +197,7 @@ const defaultConfig: DashboardConfig = {
       { label: "Slots de Chargement", value: "18", subtitle: "2.7 Mt capacité", change: "+3 vs mois dernier", changeDirection: "up" },
       { label: "Volume Engagé", value: "4.6 Mt", subtitle: "30 prochains jours", change: "+9%", changeDirection: "up" },
       { label: "Couverture Pipeline", value: "62 Jours", subtitle: "de ventes", change: "+8 jours", changeDirection: "up" },
-      { label: "Utilisation Stockage", value: "74%", subtitle: "Sites OCP (Jorf+Safi+Youssoufia)", change: "+5 pp", changeDirection: "up" },
+      { label: "Utilisation Stockage", value: "74%", subtitle: "Sites de production (Jorf+Safi+Youssoufia)", change: "+5 pp", changeDirection: "up" },
     ],
     production: [
       { month: "Jan 2026", volume: 2100 },
