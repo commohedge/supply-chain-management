@@ -554,6 +554,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
   const applyCommodityPreset = useCallback(
     async (mode: CommodityMode, opts?: { keepCompanyName?: boolean }) => {
       const { getPreset } = await import("@/data/commodityPresets");
+      const { seedLogisticsForMode } = await import("@/data/hubCommodityData");
       const preset = getPreset(mode);
       setConfig((prev) => {
         const next: DashboardConfig = {

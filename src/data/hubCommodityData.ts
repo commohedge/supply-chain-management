@@ -130,3 +130,13 @@ export function saveLogisticsRowsOnly(rows: LogisticsStatusRow[]) {
   full.logisticsGeoVersion = LOGISTICS_GEO_VERSION;
   saveHubCommodity(full);
 }
+
+/** Régénère les lignes logistique pour la commodité choisie (preset switch). */
+export function seedLogisticsForMode(mode: CommodityMode) {
+  const rows = buildLogisticsRowsForMode(mode);
+  saveLogisticsRowsOnly(rows);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(HUB_LOGISTICS_RESEED_EVENT, { detail: { mode } }));
+  }
+  return rows;
+}
