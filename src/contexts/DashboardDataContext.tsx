@@ -577,6 +577,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         return next;
       });
+      seedLogisticsForMode(mode);
     },
     [],
   );
