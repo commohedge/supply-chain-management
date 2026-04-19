@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 import type { LogisticsMappings } from "@/types/logistics";
 import { DEFAULT_FLOATING_HUBS } from "@/types/logistics";
 import { migrateReferentielAndMappingsToEnglish } from "@/i18n/referenceLocale";
+import type { CommodityMode } from "@/data/commodityPresets";
 
 // ── Types ──────────────────────────────────────────────────────
 export interface OverviewData {
@@ -120,7 +121,15 @@ export interface MapLogisticsDisplay {
 }
 
 export interface DashboardConfig {
-  general: { companyName: string; dashboardDate: string; currency: string; /** PNG/JPEG/WebP/SVG en data URL */ logoDataUrl: string };
+  general: {
+    companyName: string;
+    dashboardDate: string;
+    currency: string;
+    /** PNG/JPEG/WebP/SVG en data URL */
+    logoDataUrl: string;
+    /** Active commodity mode (drives demo data shape across all pages) */
+    commodityMode?: CommodityMode;
+  };
   overview: OverviewData;
   supply: SupplyData;
   pipeline: PipelineData;
@@ -134,9 +143,9 @@ export interface DashboardConfig {
   mapLogisticsDisplay: MapLogisticsDisplay;
 }
 
-// ── Default Data (Real OCP Data) ──────────────────────────────
+// ── Default Data (Commohedge — Phosphates preset) ──────────────────────────────
 const defaultConfig: DashboardConfig = {
-  general: { companyName: "OCP GROUP", dashboardDate: "09/04/2026", currency: "USD", logoDataUrl: "" },
+  general: { companyName: "Commohedge Supply Chain Dashboard", dashboardDate: "09/04/2026", currency: "USD", logoDataUrl: "", commodityMode: "phosphates" },
   overview: {
     kpis: [
       { label: "Production Totale", value: "12.8 Mt", change: "+6.2% vs 2025", changeDirection: "up", subtitle: "Phosphate & Engrais" },
@@ -467,6 +476,7 @@ interface DashboardDataContextType {
   updateSection: <K extends keyof DashboardConfig>(section: K, data: DashboardConfig[K]) => void;
   resetSection: (section: keyof DashboardConfig) => void;
   resetAll: () => void;
+  applyCommodityPreset: (mode: CommodityMode, opts?: { keepCompanyName?: boolean }) => void;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | null>(null);
@@ -541,8 +551,37 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
     setConfig(defaultConfig);
   }, []);
 
+  const applyCommodityPreset = useCallback(
+    async (mode: CommodityMode, opts?: { keepCompanyName?: boolean }) => {
+      const { getPreset } = await import("@/data/commodityPresets");
+      const preset = getPreset(mode);
+      setConfig((prev) => {
+        const next: DashboardConfig = {
+          general: {
+            ...prev.general,
+            commodityMode: mode,
+            currency: preset.currency || prev.general.currency,
+            companyName: opts?.keepCompanyName ? prev.general.companyName : preset.defaultCompanyName,
+          },
+          overview: preset.overview,
+          supply: preset.supply,
+          pipeline: preset.pipeline,
+          market: preset.market,
+          optionality: preset.optionality,
+          flows: preset.flows,
+          referentiel: preset.referentiel,
+          logisticsMappings: preset.logisticsMappings,
+          mapLogisticsDisplay: prev.mapLogisticsDisplay,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+    },
+    [],
+  );
+
   return (
-    <DashboardDataContext.Provider value={{ config, updateSection, resetSection, resetAll }}>
+    <DashboardDataContext.Provider value={{ config, updateSection, resetSection, resetAll, applyCommodityPreset }}>
       {children}
     </DashboardDataContext.Provider>
   );

@@ -166,7 +166,7 @@ function StringListField({
 
 export default function SettingsPage() {
   const { t } = useI18n();
-  const { config, updateSection, resetAll } = useDashboardData();
+  const { config, updateSection, resetAll, applyCommodityPreset } = useDashboardData();
   const [local, setLocal] = useState(structuredClone(config.referentiel));
   const [localLogistics, setLocalLogistics] = useState<LogisticsMappings>(() => structuredClone(config.logisticsMappings));
   const [localGeneral, setLocalGeneral] = useState(() => structuredClone(config.general));
@@ -234,6 +234,49 @@ export default function SettingsPage() {
         <TabsContent value="general">
           <div className="chart-container max-w-2xl space-y-6">
             <SectionHeader title={t("settings.section.general")} subtitle={t("settings.section.generalSub")} />
+
+            {/* Commodity preset selector */}
+            <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div>
+                <Label className="text-sm font-semibold">Commodity vertical</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Switch the entire dashboard (KPIs, ports, clients, products, market data) to a different commodity vertical.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: "phosphates", label: "Phosphates & Fertilizers", emoji: "🌾" },
+                  { id: "copper", label: "Copper & Base Metals", emoji: "🟠" },
+                  { id: "lng", label: "Energy — LNG / Gas", emoji: "⛽" },
+                  { id: "grains", label: "Soft Commodities — Grains", emoji: "🌽" },
+                ].map((p) => {
+                  const active = (localGeneral.commodityMode ?? "phosphates") === p.id;
+                  return (
+                    <Button
+                      key={p.id}
+                      type="button"
+                      size="sm"
+                      variant={active ? "default" : "outline"}
+                      className="text-xs"
+                      onClick={() => {
+                        if (!confirm(`Replace all dashboard data with the "${p.label}" demo dataset?\n\nYour custom company name and logo will be kept if customized.`)) return;
+                        const keepName = localGeneral.companyName !== "Commohedge Supply Chain Dashboard" &&
+                                         !["Commohedge Phosphates", "Commohedge Metals", "Commohedge Energy", "Commohedge Agri"].includes(localGeneral.companyName);
+                        applyCommodityPreset(p.id as any, { keepCompanyName: keepName });
+                        toast.success(`Switched to ${p.label}`);
+                        setTimeout(() => window.location.reload(), 400);
+                      }}
+                    >
+                      <span className="mr-1.5">{p.emoji}</span> {p.label}
+                    </Button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-muted-foreground/70">
+                Active mode: <span className="font-mono text-primary">{localGeneral.commodityMode ?? "phosphates"}</span>
+              </p>
+            </div>
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="settings-company">{t("settings.general.companyName")}</Label>
