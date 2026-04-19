@@ -4,55 +4,133 @@ import { objectsToCSV } from "@/lib/csv";
 import { fleetMonitoringMeta, loadBulkFleetRecordsFromStorage } from "@/data/bulkVesselsFleet";
 import { coordsNearDestination } from "@/lib/logisticsDestinationCoords";
 import { addDaysToTodayIso, normalizeEtaPair } from "@/lib/etaDate";
+import type { CommodityMode } from "@/data/commodityPresets";
 
-const DEST = ["Brazil", "India", "USA", "Mexico", "Pakistan", "Australia", "Europe"];
-const POD = ["Santos", "Paradip", "Mumbai", "Tampa", "Antwerp", "Mombasa", "Lagos", "Casablanca"];
-const PRODUCTS = ["DAP", "MAP", "TSP"];
-const VOLS = [35, 50, 45];
-const ETAS = [30, 35, 26];
-const COSTS = [30, 32, 13];
-const STATUS_CYCLE = [
-  "To Morocco",
-  "Loading Open",
-  "Loading",
-  "Loading Sold",
-  "Transit Open",
-  "Transit Sold",
-  "Transit Subsidiary",
-  "Floating Storage",
-  "Regional Hub",
-  "Transit",
-  "Line Up",
-];
+interface ModeSeedRecipe {
+  destinations: string[];
+  /** Port of Discharge (POD) candidates */
+  pods: string[];
+  products: string[];
+  /** Volume samples (kt cargo) */
+  volumes: number[];
+  etas: number[];
+  costs: number[];
+  statusCycle: string[];
+}
 
-export function buildDefaultLogisticsRows(): LogisticsStatusRow[] {
+const MODE_SEED: Record<CommodityMode, ModeSeedRecipe> = {
+  phosphates: {
+    destinations: ["Brazil", "India", "USA", "Mexico", "Pakistan", "Australia", "Europe"],
+    pods: ["Santos", "Paradip", "Mumbai", "Tampa", "Antwerp", "Mombasa", "Lagos", "Casablanca"],
+    products: ["DAP", "MAP", "TSP"],
+    volumes: [35, 50, 45],
+    etas: [30, 35, 26],
+    costs: [30, 32, 13],
+    statusCycle: [
+      "To Morocco",
+      "Loading Open",
+      "Loading",
+      "Loading Sold",
+      "Transit Open",
+      "Transit Sold",
+      "Transit Subsidiary",
+      "Floating Storage",
+      "Regional Hub",
+      "Transit",
+      "Line Up",
+    ],
+  },
+  copper: {
+    destinations: ["China", "Germany", "Netherlands", "USA", "Japan", "South Korea", "Italy"],
+    pods: ["Shanghai", "Yantai", "Rotterdam", "Hamburg", "New Orleans", "Yokohama", "Incheon"],
+    products: ["Cathode", "Concentrate", "Wire Rod"],
+    volumes: [10, 15, 8],
+    etas: [32, 28, 22],
+    costs: [120, 95, 110],
+    statusCycle: [
+      "Loading",
+      "At Anchor",
+      "Transit",
+      "Discharging",
+      "Delivered",
+      "LME Warranted",
+      "Bonded Storage",
+    ],
+  },
+  lng: {
+    destinations: ["Japan", "South Korea", "China", "India", "Netherlands", "Belgium", "Spain", "France", "UK", "Italy", "Turkey"],
+    pods: ["Tokyo Bay", "Incheon", "Yangshan", "Dahej", "Rotterdam", "Zeebrugge"],
+    products: ["LNG", "LPG"],
+    volumes: [70, 85, 60], // cargo size in kt LNG (~155k m³ ~ 70kt)
+    etas: [18, 24, 12],
+    costs: [1.2, 1.4, 0.8], // freight per mmbtu equivalent
+    statusCycle: [
+      "Loading",
+      "Laden Voyage",
+      "At Anchor (Asia)",
+      "Discharging",
+      "Ballast Voyage",
+      "Floating Storage",
+      "Reload",
+      "Diverted",
+    ],
+  },
+  grains: {
+    destinations: ["China", "Egypt", "Mexico", "Indonesia", "Japan", "South Korea", "EU-27", "Algeria", "Nigeria", "Turkey"],
+    pods: ["Qingdao", "Alexandria", "Veracruz", "Hamburg", "Rotterdam", "Yokohama", "Incheon"],
+    products: ["Soybean", "Corn", "Wheat HRW", "Soymeal"],
+    volumes: [60, 55, 65, 35],
+    etas: [32, 18, 8, 22],
+    costs: [42, 32, 22, 28],
+    statusCycle: [
+      "Loading",
+      "Anchorage",
+      "Sailing",
+      "At Discharge Port",
+      "Discharging",
+      "Free Pratique",
+      "Cleared",
+      "Demurrage",
+      "Floating Storage",
+    ],
+  },
+};
+
+export function buildLogisticsRowsForMode(mode: CommodityMode): LogisticsStatusRow[] {
+  const recipe = MODE_SEED[mode] ?? MODE_SEED.phosphates;
   const fleet = loadBulkFleetRecordsFromStorage();
   const n = Math.max(1, fleet.length);
-  return Array.from({ length: 30 }, (_, i) => {
+  const total = 30;
+  return Array.from({ length: total }, (_, i) => {
     const vessel = fleet[i % n];
     const meta = fleetMonitoringMeta(vessel.name);
-    const etaDays = ETAS[i % 3];
-    const destination = DEST[i % DEST.length];
+    const etaDays = recipe.etas[i % recipe.etas.length];
+    const destination = recipe.destinations[i % recipe.destinations.length];
     const { lat, lng } = coordsNearDestination(destination, i);
     return {
-      id: `log-seed-${i}`,
-      volumeKt: VOLS[i % 3],
-      vesselStatus: STATUS_CYCLE[i % STATUS_CYCLE.length],
+      id: `log-seed-${mode}-${i}`,
+      volumeKt: recipe.volumes[i % recipe.volumes.length],
+      vesselStatus: recipe.statusCycle[i % recipe.statusCycle.length],
       vesselId: `V${i + 1}`,
       vesselName: vessel.name,
       destination,
-      destinationPort: POD[i % POD.length],
+      destinationPort: recipe.pods[i % recipe.pods.length],
       clientName: "",
-      product: PRODUCTS[i % 3],
+      product: recipe.products[i % recipe.products.length],
       etaDays,
       etaDate: addDaysToTodayIso(etaDays),
-      costUsdPerT: COSTS[i % 3],
+      costUsdPerT: recipe.costs[i % recipe.costs.length],
       imo: meta?.imo ?? "",
       mmsi: meta?.mmsi ?? "",
       lat,
       lng,
     };
   });
+}
+
+/** Backwards-compatible default seed (phosphates). */
+export function buildDefaultLogisticsRows(): LogisticsStatusRow[] {
+  return buildLogisticsRowsForMode("phosphates");
 }
 
 export function rowsToCsvRecords(rows: LogisticsStatusRow[]): Record<string, string>[] {
