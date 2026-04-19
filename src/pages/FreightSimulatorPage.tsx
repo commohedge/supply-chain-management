@@ -301,16 +301,16 @@ function RouteSimulationCard({
         <div className="flex flex-wrap items-center gap-1.5">
           <Select value={r.origin} onValueChange={(v) => onUpdate(r.id, "origin", v)}>
             <SelectTrigger className="h-7 text-[10px] bg-background/80 min-w-[100px] max-w-[140px]">
-              <SelectValue />
+              <SelectValue>{tCountry(r.origin, locale)}</SelectValue>
             </SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
           </Select>
           <span className="text-[10px] text-muted-foreground">→</span>
           <Select value={r.destination} onValueChange={(v) => onUpdate(r.id, "destination", v)}>
             <SelectTrigger className="h-7 text-[10px] bg-background/80 min-w-[100px] max-w-[140px]">
-              <SelectValue />
+              <SelectValue>{tCountry(r.destination, locale)}</SelectValue>
             </SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c} value={c} className="text-xs">{tCountry(c, locale)}</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </CardHeader>
