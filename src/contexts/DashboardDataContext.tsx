@@ -476,6 +476,7 @@ interface DashboardDataContextType {
   updateSection: <K extends keyof DashboardConfig>(section: K, data: DashboardConfig[K]) => void;
   resetSection: (section: keyof DashboardConfig) => void;
   resetAll: () => void;
+  applyCommodityPreset: (mode: CommodityMode, opts?: { keepCompanyName?: boolean }) => void;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | null>(null);
@@ -550,8 +551,37 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
     setConfig(defaultConfig);
   }, []);
 
+  const applyCommodityPreset = useCallback(
+    async (mode: CommodityMode, opts?: { keepCompanyName?: boolean }) => {
+      const { getPreset } = await import("@/data/commodityPresets");
+      const preset = getPreset(mode);
+      setConfig((prev) => {
+        const next: DashboardConfig = {
+          general: {
+            ...prev.general,
+            commodityMode: mode,
+            currency: preset.currency || prev.general.currency,
+            companyName: opts?.keepCompanyName ? prev.general.companyName : preset.defaultCompanyName,
+          },
+          overview: preset.overview,
+          supply: preset.supply,
+          pipeline: preset.pipeline,
+          market: preset.market,
+          optionality: preset.optionality,
+          flows: preset.flows,
+          referentiel: preset.referentiel,
+          logisticsMappings: preset.logisticsMappings,
+          mapLogisticsDisplay: prev.mapLogisticsDisplay,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+    },
+    [],
+  );
+
   return (
-    <DashboardDataContext.Provider value={{ config, updateSection, resetSection, resetAll }}>
+    <DashboardDataContext.Provider value={{ config, updateSection, resetSection, resetAll, applyCommodityPreset }}>
       {children}
     </DashboardDataContext.Provider>
   );
