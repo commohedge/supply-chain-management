@@ -211,10 +211,10 @@ export default function SettingsPage() {
           <p className="page-subtitle">{t("settings.subtitle")}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="destructive" size="sm" onClick={handleReset} className="text-xs">
+          <Button type="button" variant="destructive" size="sm" onClick={handleReset} className="text-xs">
             <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> {t("settings.reset")}
           </Button>
-          <Button size="sm" onClick={save} className="text-xs">
+          <Button type="button" size="sm" onClick={save} className="text-xs">
             <Save className="h-3.5 w-3.5 mr-1.5" /> {t("settings.saveAll")}
           </Button>
         </div>
