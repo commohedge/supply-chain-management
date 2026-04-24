@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Supply Chain Dashboard
 
-TODO: Document your project here
+Vite + React + TypeScript + Tailwind.
